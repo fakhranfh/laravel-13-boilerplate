@@ -99,7 +99,7 @@ function inferSummary(path, cat, sizeLines) {
     'tests/Unit/ExampleTest.php': 'Example unit test placeholder.',
     'composer.json': 'PHP dependency manifest defining Laravel, Fortify, and dev packages.',
     'package.json': 'Node.js dependency manifest with Vite, Tailwind CSS, and build tools.',
-    'README.md': 'Project overview: Fansafin personal finance tracker via WhatsApp.',
+    'README.md': 'Project overview: Laravel 13 Boilerplate personal finance tracker via WhatsApp.',
     'AGENTS.md': 'Agent guidelines for Laravel Boost with coding conventions and tool instructions.',
     'phpunit.xml': 'PHPUnit configuration with test suite definitions and environment settings.',
   };

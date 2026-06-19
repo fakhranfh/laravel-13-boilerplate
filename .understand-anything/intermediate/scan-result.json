@@ -1,5 +1,5 @@
 {
-  "name": "Fansafin",
+  "name": "Laravel 13 Boilerplate",
   "description": "A personal finance tracker using WhatsApp as its primary interface. Log income and expenses by sending chat messages, with real-time processing and a Laravel-powered dashboard.",
   "languages": [
     "css",

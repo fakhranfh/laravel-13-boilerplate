@@ -70,7 +70,7 @@
       "type": "document",
       "name": "README.md",
       "filePath": "README.md",
-      "summary": "Project overview: Fansafin personal finance tracker via WhatsApp.",
+      "summary": "Project overview: Laravel 13 Boilerplate personal finance tracker via WhatsApp.",
       "tags": [
         "documentation"
       ],

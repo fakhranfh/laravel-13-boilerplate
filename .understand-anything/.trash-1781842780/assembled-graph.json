@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "project": {
-    "name": "Fansafin",
+    "name": "Laravel 13 Boilerplate",
     "languages": [
       "css",
       "javascript",
@@ -449,7 +449,7 @@
       "type": "document",
       "name": "README.md",
       "filePath": "README.md",
-      "summary": "Project overview: Fansafin personal finance tracker via WhatsApp.",
+      "summary": "Project overview: Laravel 13 Boilerplate personal finance tracker via WhatsApp.",
       "tags": [
         "documentation"
       ],
@@ -1724,7 +1724,7 @@
     {
       "order": 1,
       "title": "Project Overview",
-      "description": "Start with the README to understand Fansafin — a WhatsApp-based personal finance tracker built on Laravel. The AGENTS.md file provides coding guidelines and conventions.",
+      "description": "Start with the README to understand Laravel 13 Boilerplate — a WhatsApp-based personal finance tracker built on Laravel. The AGENTS.md file provides coding guidelines and conventions.",
       "nodeIds": [
         "document:README.md",
         "document:AGENTS.md"
