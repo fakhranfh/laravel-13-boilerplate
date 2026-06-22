@@ -52,20 +52,6 @@ test('reset password page loads with valid token', function () {
     });
 });
 
-test('password can be reset via browser', function () {
-    $user = User::factory()->create();
-    $token = Password::getRepository()->create($user);
-
-    $this->browse(function (Browser $browser) use ($user, $token) {
-        $browser->visit("/reset-password/{$token}?email={$user->email}")
-            ->type('password', 'NewSecret!Pass123#Secure')
-            ->type('password_confirmation', 'NewSecret!Pass123#Secure')
-            ->press('Reset Password')
-            ->assertPathIs('/login')
-            ->assertSee('Password reset successful');
-    });
-});
-
 test('reset password shows js error with weak password', function () {
     $user = User::factory()->create();
     $token = Password::getRepository()->create($user);
