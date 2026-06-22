@@ -22,9 +22,9 @@
             </a>
         </div>
         
-        @if (session('success'))
+        @if (session('status') || session('success'))
             <div class="mb-space-md rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700 text-body-sm font-body-sm">
-                {{ session('success') }}
+                {{ session('status') ?? session('success') }}
             </div>
         @endif
         
