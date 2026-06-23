@@ -153,6 +153,30 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Run tests: `php artisan test --compact` or filter: `php artisan test --compact --filter=testName`.
 - Do NOT delete tests without approval.
 
+=== testing requirements ===
+
+# Testing Requirements
+
+This project requires three types of tests:
+
+1. **Feature Tests (Pest)**: Unit and feature tests using Pest v4.
+   - Create with: `php artisan make:test --pest {name}`
+   - Run with: `php artisan test --compact`
+   - Most tests should be feature tests; only use `--unit` flag for isolated unit tests.
+
+2. **Browser Tests (Laravel Dusk)**: End-to-end browser automation tests.
+   - Run with: `php artisan dusk`
+   - Tests user interactions in a real browser.
+   - Requires `php artisan serve` running on port 8000.
+
+3. **Stress Tests (k6)**: Performance and load testing.
+   - Written in JavaScript using k6.
+   - Tests application performance under load.
+   - Session cookie name follows `APP_NAME` format: `laravel-13-boilerplate-session`.
+   - Requires DB migrations to be fresh before running.
+
+When implementing features or fixing bugs, ensure all three test types are considered and appropriate tests are created for the changes.
+
 === project-session-context ===
 
 # Project Session Context (2026-06-22)
