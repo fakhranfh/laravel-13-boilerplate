@@ -8,9 +8,12 @@ test('unverified user sees email verification notice after login', function () {
 
     $this->browse(function (Browser $browser) use ($user) {
         $browser->visit('/login')
+            ->waitForLocation('/login')
             ->type('email', $user->email)
-            ->type('password', 'password')
+            ->type('password', 'Password@123123')
+            ->pause(500)
             ->press('Login')
+            ->pause(1000)
             ->assertPathIs('/email/verify')
             ->assertSee('Verify your email address');
     });
@@ -21,9 +24,12 @@ test('verified user goes to dashboard after login', function () {
 
     $this->browse(function (Browser $browser) use ($user) {
         $browser->visit('/login')
+            ->waitForLocation('/login')
             ->type('email', $user->email)
-            ->type('password', 'password')
+            ->type('password', 'Password@123123')
+            ->pause(500)
             ->press('Login')
+            ->pause(1000)
             ->assertPathIs('/dashboard')
             ->assertSee('Dashboard');
     });
@@ -34,10 +40,14 @@ test('resend verification email button shows success message', function () {
 
     $this->browse(function (Browser $browser) use ($user) {
         $browser->visit('/login')
+            ->waitForLocation('/login')
             ->type('email', $user->email)
-            ->type('password', 'password')
+            ->type('password', 'Password@123123')
+            ->pause(500)
             ->press('Login')
+            ->pause(1000)
             ->press('Resend Verification Email')
+            ->pause(1000)
             ->assertPathIs('/email/verify')
             ->assertSee('A new verification link has been sent');
     });
@@ -48,11 +58,15 @@ test('logout button on verify page works', function () {
 
     $this->browse(function (Browser $browser) use ($user) {
         $browser->visit('/login')
+            ->waitForLocation('/login')
             ->type('email', $user->email)
-            ->type('password', 'password')
+            ->type('password', 'Password@123123')
+            ->pause(500)
             ->press('Login')
+            ->pause(1000)
             ->assertPathIs('/email/verify')
             ->press('Log out')
+            ->pause(1000)
             ->assertPathIs('/login');
     });
 });
