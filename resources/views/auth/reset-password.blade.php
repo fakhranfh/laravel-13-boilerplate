@@ -12,7 +12,10 @@
     </p>
 </div>
 @include('auth.success-and-error-alert')
-<form class="space-y-6" id="reset-form" method="POST" onsubmit="return validateRegisterForm(event)">
+<form class="space-y-6" id="reset-form" method="POST" action="{{ route('password.update') }}" onsubmit="return validateRegisterForm(event)">
+    @csrf
+    <input type="hidden" name="token" value="{{ $request->route('token') }}">
+    <input type="hidden" name="email" value="{{ $request->email }}">
     <!-- New Password Input -->
     <div>
         <label class="block font-label-md text-label-md text-on-surface" for="new-password">New Password</label>
