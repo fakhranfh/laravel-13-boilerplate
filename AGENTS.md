@@ -153,4 +153,60 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Run tests: `php artisan test --compact` or filter: `php artisan test --compact --filter=testName`.
 - Do NOT delete tests without approval.
 
+=== project-session-context ===
+
+# Project Session Context (2026-06-22)
+
+Key discoveries about this specific Laravel 13 boilerplate project.
+
+## CSRF in Tests
+
+- Laravel 13 renamed `VerifyCsrfToken` → `PreventRequestForgery`
+- `PreventRequestForgery::runningUnitTests()` checks `runningInConsole() && runningUnitTests()`, so CSRF is **NOT auto-disabled** in HTTP feature tests
+- Fix: `tests/TestCase.php` has `$this->withoutMiddleware(PreventRequestForgery::class)` in `setUp()`
+
+## Dusk Browser Tests
+
+- `DatabaseMigrations` drops `sessions` table between test classes → session-based login flows become flaky
+- `DatabaseTransactions` **does NOT work** for Dusk (server runs in separate process, can't see transaction)
+- HTML5 `required` attributes block form submission in Dusk → use `$browser->script()` before `press()`
+- `$browser->script()` returns array, **cannot chain** — must call before the chain
+- `$browser->press('Logout')` works for `<button type="submit">` inside `<form>`
+
+## k6 Stress Testing
+
+- `open()` resolves relative to **script directory**, not `pwd`
+- Cookie jar does NOT share between `setup()` and `default()` — prefer per-VU flows
+- k6 v2 cookie jar auto-manages cookies within a single VU iteration
+- PHP built-in server handles only 1-2 concurrent requests
+- Session cookie name uses `APP_NAME`: `laravel-13-boilerplate-session`
+- Extract cookies from `res.headers['Set-Cookie']` regex: `/([a-z0-9_-]+session)=([^;]+)/i`
+
+## Blade Template Issues Fixed
+
+- `reset-password.blade.php`: added `action="{{ route('password.update') }}"`, `@csrf`, hidden `token` + `email` inputs
+- `reset-password.blade.php`: use `$request->route('token')` not `$request->token` for route params
+- `login.blade.php`: display both `session('status')` and `session('success')` for flash messages
+- `CustomPasswordResetResponse` flashes `status`, not `success`
+
+## Password Rules
+
+- `PasswordValidationRules`: `min(8)->mixedCase()->numbers()->symbols()->uncompromised()`
+- `uncompromised()` hits external API — mock with `Http::fake()` in feature tests, use random long passwords in k6/browser tests
+- `Password::getRepository()->delete($user)` deletes **ALL** tokens for that email, not just the used one
+
+## Fortify Notes
+
+- `MustVerifyEmail` redirects to `/email/verify` after registration, not `/dashboard`
+- `password.reset` route uses `{token}` in URL path, not query string
+- `password.update` is POST `/reset-password` (no token in URL)
+- `home` config default is `/dashboard`
+
+## Database
+
+- Dev DB: MySQL (`laravel-13-boilerplate`), Test DB: MySQL (`laravel-13-boilerplate_test`)
+- SQLite not available on this machine → phpunit.xml uses MySQL
+- `php artisan dusk` needs `php artisan serve` running on port 8000
+- DB tables get wiped after `php artisan dusk` (DatabaseMigrations) → re-migrate before k6
+
 </laravel-boost-guidelines>
