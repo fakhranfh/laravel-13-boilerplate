@@ -68,13 +68,21 @@
                         <div class="relative">
                             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary/60 text-[20px]">lock</span>
                             <input
-                                class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-space-sm pl-10 pr-space-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('current_password') border-error @enderror"
+                                class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-space-sm pl-10 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('current_password') border-error @enderror"
                                 id="current_password"
                                 name="current_password"
                                 type="password"
                                 autocomplete="current-password"
                                 required
                             />
+                            <button
+                                type="button"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary/60 hover:text-secondary transition-colors"
+                                onclick="togglePasswordVisibility('current_password')"
+                                tabindex="-1"
+                            >
+                                <span class="material-symbols-outlined text-[20px]" id="current_password_icon">visibility</span>
+                            </button>
                         </div>
                         @error('current_password')
                             <p class="text-error text-body-sm font-body-sm mt-space-xs">{{ $message }}</p>
@@ -87,13 +95,21 @@
                         <div class="relative">
                             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary/60 text-[20px]">lock_reset</span>
                             <input
-                                class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-space-sm pl-10 pr-space-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('password') border-error @enderror"
+                                class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-space-sm pl-10 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('password') border-error @enderror"
                                 id="password"
                                 name="password"
                                 type="password"
                                 autocomplete="new-password"
                                 required
                             />
+                            <button
+                                type="button"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary/60 hover:text-secondary transition-colors"
+                                onclick="togglePasswordVisibility('password')"
+                                tabindex="-1"
+                            >
+                                <span class="material-symbols-outlined text-[20px]" id="password_icon">visibility</span>
+                            </button>
                         </div>
                         @error('password')
                             <p class="text-error text-body-sm font-body-sm mt-space-xs">{{ $message }}</p>
@@ -110,13 +126,21 @@
                         <div class="relative">
                             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary/60 text-[20px]">verified</span>
                             <input
-                                class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-space-sm pl-10 pr-space-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('password_confirmation') border-error @enderror"
+                                class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-space-sm pl-10 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('password_confirmation') border-error @enderror"
                                 id="password_confirmation"
                                 name="password_confirmation"
                                 type="password"
                                 autocomplete="new-password"
                                 required
                             />
+                            <button
+                                type="button"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary/60 hover:text-secondary transition-colors"
+                                onclick="togglePasswordVisibility('password_confirmation')"
+                                tabindex="-1"
+                            >
+                                <span class="material-symbols-outlined text-[20px]" id="password_confirmation_icon">visibility</span>
+                            </button>
                         </div>
                         @error('password_confirmation')
                             <p class="text-error text-body-sm font-body-sm mt-space-xs">{{ $message }}</p>
@@ -173,6 +197,19 @@
                 if (/[^a-zA-Z0-9]/.test(password)) strength++;
 
                 return strength;
+            }
+
+            function togglePasswordVisibility(fieldId) {
+                const field = document.getElementById(fieldId);
+                const icon = document.getElementById(fieldId + '_icon');
+
+                if (field.type === 'password') {
+                    field.type = 'text';
+                    icon.textContent = 'visibility_off';
+                } else {
+                    field.type = 'password';
+                    icon.textContent = 'visibility';
+                }
             }
 
             passwordInput.addEventListener('input', function() {
