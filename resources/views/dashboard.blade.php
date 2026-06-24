@@ -4,94 +4,72 @@
 
 @section('body_class', 'bg-background text-on-background min-h-screen flex flex-col font-body-md')
 
-@push('styles')
-    <style>
-        .stat-card {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 120px;
-            height: 120px;
-            background: var(--bg-gradient);
-            border-radius: 50%;
-            opacity: 0.1;
-            pointer-events: none;
-        }
-    </style>
-@endpush
-
 @section('content')
     <x-topbar title="Dashboard" />
 
     <!-- Main Content -->
-    <main class="flex-grow py-space-xl px-gutter">
-        <div class="max-w-7xl mx-auto">
+    <main class="flex-grow py-space-lg px-gutter">
+        <div class="max-w-7xl mx-auto space-y-space-lg">
 
             <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg mb-space-xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
                 <!-- Total Users Card -->
-                <div class="stat-card bg-surface rounded-xl border border-outline-variant p-space-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-shadow duration-200" style="--bg-gradient: #004ac6;">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <p class="font-label-md text-label-md text-secondary uppercase">Total Pengguna</p>
-                            <p class="font-headline-md text-headline-md text-on-surface mt-space-md">1.284</p>
-                            <div class="flex items-center gap-space-xs mt-space-md">
-                                <span class="material-symbols-outlined text-[16px] text-success">trending_up</span>
+                <div class="bg-surface border border-outline-variant rounded-lg p-space-lg hover:border-outline transition-colors duration-150">
+                    <div class="space-y-space-md">
+                        <div class="flex items-center justify-between">
+                            <span class="text-label-md text-secondary uppercase font-label-md">Total Pengguna</span>
+                            <span class="material-symbols-outlined text-primary text-[20px]">group</span>
+                        </div>
+                        <div>
+                            <p class="font-headline-md text-headline-md text-on-surface">1.284</p>
+                            <div class="flex items-center gap-space-xs mt-space-sm">
+                                <span class="material-symbols-outlined text-[14px] text-success">trending_up</span>
                                 <p class="font-body-sm text-body-sm text-success">+12% bulan ini</p>
                             </div>
-                        </div>
-                        <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined text-primary text-[28px]">group</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Revenue Card -->
-                <div class="stat-card bg-surface rounded-xl border border-outline-variant p-space-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-shadow duration-200" style="--bg-gradient: #16A34A;">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <p class="font-label-md text-label-md text-secondary uppercase">Pendapatan</p>
-                            <p class="font-headline-md text-headline-md text-on-surface mt-space-md">Rp 45.000.000</p>
-                            <div class="flex items-center gap-space-xs mt-space-md">
-                                <span class="material-symbols-outlined text-[16px] text-secondary">dashboard</span>
+                <div class="bg-surface border border-outline-variant rounded-lg p-space-lg hover:border-outline transition-colors duration-150">
+                    <div class="space-y-space-md">
+                        <div class="flex items-center justify-between">
+                            <span class="text-label-md text-secondary uppercase font-label-md">Pendapatan</span>
+                            <span class="material-symbols-outlined text-success text-[20px]">attach_money</span>
+                        </div>
+                        <div>
+                            <p class="font-headline-md text-headline-md text-on-surface">Rp 45.000.000</p>
+                            <div class="flex items-center gap-space-xs mt-space-sm">
+                                <span class="material-symbols-outlined text-[14px] text-secondary">dashboard</span>
                                 <p class="font-body-sm text-body-sm text-secondary">Stabil</p>
                             </div>
-                        </div>
-                        <div class="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined text-success text-[28px]">attach_money</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- System Status Card -->
-                <div class="stat-card bg-surface rounded-xl border border-outline-variant p-space-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-shadow duration-200" style="--bg-gradient: #2563EB;">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <p class="font-label-md text-label-md text-secondary uppercase">Sistem Status</p>
-                            <p class="font-headline-md text-headline-md text-success mt-space-md">Optimal</p>
-                            <div class="flex items-center gap-space-xs mt-space-md">
-                                <span class="material-symbols-outlined text-[16px] text-success" data-weight="fill">check_circle</span>
+                <div class="bg-surface border border-outline-variant rounded-lg p-space-lg hover:border-outline transition-colors duration-150">
+                    <div class="space-y-space-md">
+                        <div class="flex items-center justify-between">
+                            <span class="text-label-md text-secondary uppercase font-label-md">Sistem Status</span>
+                            <span class="material-symbols-outlined text-info text-[20px]">shield</span>
+                        </div>
+                        <div>
+                            <p class="font-headline-md text-headline-md text-success">Optimal</p>
+                            <div class="flex items-center gap-space-xs mt-space-sm">
+                                <span class="material-symbols-outlined text-[14px] text-success" data-weight="fill">check_circle</span>
                                 <p class="font-body-sm text-body-sm text-secondary">Semua layanan berjalan baik</p>
                             </div>
-                        </div>
-                        <div class="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined text-success text-[28px]">shield</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Recent Activity Section -->
-            <div class="bg-surface rounded-xl border border-outline-variant shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
-                <div class="p-space-lg border-b border-outline-variant">
+            <div class="bg-surface border border-outline-variant rounded-lg overflow-hidden">
+                <div class="px-space-lg py-space-md border-b border-outline-variant">
                     <div class="flex items-center gap-space-md">
-                        <span class="material-symbols-outlined text-on-surface">history</span>
+                        <span class="material-symbols-outlined text-on-surface text-[20px]">history</span>
                         <h2 class="font-headline-sm text-headline-sm text-on-surface">Aktivitas Terbaru</h2>
                     </div>
                 </div>
