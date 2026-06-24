@@ -36,6 +36,10 @@
                     <span class="material-symbols-outlined text-[20px]">person</span>
                     <span class="font-body-md text-body-md">Edit Profile</span>
                 </a>
+                <a href="{{ route('change-password') }}" class="flex items-center gap-space-md px-space-lg py-space-md text-secondary hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 border-b border-outline-variant">
+                    <span class="material-symbols-outlined text-[20px]">lock</span>
+                    <span class="font-body-md text-body-md">Change Password</span>
+                </a>
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf
                     <button type="submit" class="w-full flex items-center gap-space-md px-space-lg py-space-md text-error hover:bg-error/5 transition-colors duration-150 font-body-md text-body-md">

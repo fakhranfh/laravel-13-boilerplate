@@ -105,14 +105,20 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="pt-space-lg mt-space-lg border-t border-outline-variant flex justify-end gap-space-md">
-                        <a href="{{ route('dashboard') }}" class="px-space-lg py-space-sm rounded-lg border border-outline-variant bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors inline-block">
-                            Cancel
+                    <div class="pt-space-lg mt-space-lg border-t border-outline-variant flex flex-col sm:flex-row justify-between gap-space-md">
+                        <a href="{{ route('change-password') }}" class="px-space-lg py-space-sm rounded-lg border border-outline-variant bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center justify-center sm:justify-start gap-space-sm">
+                            <span class="material-symbols-outlined text-[18px]">lock</span>
+                            Change Password
                         </a>
-                        <button class="px-space-lg py-space-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-space-sm shadow-sm" type="submit">
-                            <span class="material-symbols-outlined text-[18px]">save</span>
-                            Save Changes
-                        </button>
+                        <div class="flex gap-space-md">
+                            <a href="{{ route('dashboard') }}" class="px-space-lg py-space-sm rounded-lg border border-outline-variant bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors inline-block">
+                                Cancel
+                            </a>
+                            <button class="px-space-lg py-space-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-space-sm shadow-sm" type="submit">
+                                <span class="material-symbols-outlined text-[18px]">save</span>
+                                Save Changes
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
