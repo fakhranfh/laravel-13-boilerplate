@@ -1,101 +1,150 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Sederhana</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+@extends('master')
+
+@section('title', 'Dashboard')
+
+@section('body_class', 'bg-background text-on-background min-h-screen flex flex-col font-body-md')
+
+@push('styles')
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; }
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: var(--bg-gradient);
+            border-radius: 50%;
+            opacity: 0.1;
+            pointer-events: none;
+        }
     </style>
-</head>
-<body class="bg-gray-100 min-h-screen">
+@endpush
 
-    <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Dashboard Utama
-            </h2>
-            
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-semibold rounded text-sm transition duration-150 ease-in-out">
-                    Logout
-                </button>
-            </form>
-        </div>
-    </header>
+@section('content')
+    <x-topbar title="Dashboard" />
 
-    <main class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
-                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Pengguna</p>
-                    <p class="text-3xl font-bold text-gray-900 mt-2">1.284</p>
-                    <p class="text-sm text-green-600 mt-1 font-medium">&uarr; 12% bulan ini</p>
+    <!-- Main Content -->
+    <main class="flex-grow py-space-xl px-gutter">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg mb-space-xl">
+                <!-- Total Users Card -->
+                <div class="stat-card bg-surface rounded-xl border border-outline-variant p-space-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-shadow duration-200" style="--bg-gradient: #004ac6;">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <p class="font-label-md text-label-md text-secondary uppercase">Total Pengguna</p>
+                            <p class="font-headline-md text-headline-md text-on-surface mt-space-md">1.284</p>
+                            <div class="flex items-center gap-space-xs mt-space-md">
+                                <span class="material-symbols-outlined text-[16px] text-success">trending_up</span>
+                                <p class="font-body-sm text-body-sm text-success">+12% bulan ini</p>
+                            </div>
+                        </div>
+                        <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-primary text-[28px]">group</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
-                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Pendapatan</p>
-                    <p class="text-3xl font-bold text-gray-900 mt-2">Rp 45.000.000</p>
-                    <p class="text-sm text-gray-500 mt-1 font-medium">Stabil</p>
+                <!-- Revenue Card -->
+                <div class="stat-card bg-surface rounded-xl border border-outline-variant p-space-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-shadow duration-200" style="--bg-gradient: #16A34A;">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <p class="font-label-md text-label-md text-secondary uppercase">Pendapatan</p>
+                            <p class="font-headline-md text-headline-md text-on-surface mt-space-md">Rp 45.000.000</p>
+                            <div class="flex items-center gap-space-xs mt-space-md">
+                                <span class="material-symbols-outlined text-[16px] text-secondary">dashboard</span>
+                                <p class="font-body-sm text-body-sm text-secondary">Stabil</p>
+                            </div>
+                        </div>
+                        <div class="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-success text-[28px]">attach_money</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
-                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Sistem Status</p>
-                    <p class="text-3xl font-bold text-green-600 mt-2">Optimal</p>
-                    <p class="text-sm text-gray-500 mt-1 font-medium">Semua layanan berjalan baik</p>
+                <!-- System Status Card -->
+                <div class="stat-card bg-surface rounded-xl border border-outline-variant p-space-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-shadow duration-200" style="--bg-gradient: #2563EB;">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <p class="font-label-md text-label-md text-secondary uppercase">Sistem Status</p>
+                            <p class="font-headline-md text-headline-md text-success mt-space-md">Optimal</p>
+                            <div class="flex items-center gap-space-xs mt-space-md">
+                                <span class="material-symbols-outlined text-[16px] text-success" data-weight="fill">check_circle</span>
+                                <p class="font-body-sm text-body-sm text-secondary">Semua layanan berjalan baik</p>
+                            </div>
+                        </div>
+                        <div class="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-success text-[28px]">shield</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Aktivitas Terbaru</h3>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-left text-sm whitespace-nowrap">
-                            <thead class="uppercase tracking-wider border-b-2 text-gray-500">
-                                <tr>
-                                    <th scope="col" class="px-6 py-4">Nama</th>
-                                    <th scope="col" class="px-6 py-4">Aktivitas</th>
-                                    <th scope="col" class="px-6 py-4">Tanggal</th>
-                                    <th scope="col" class="px-6 py-4">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-medium text-gray-900">Budi Santoso</td>
-                                    <td class="px-6 py-4 text-gray-600">Login ke sistem</td>
-                                    <td class="px-6 py-4 text-gray-600">18 Jun 2026</td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Sukses</span>
-                                    </td>
-                                </tr>
-                                <tr class="border-b hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-medium text-gray-900">Siti Aminah</td>
-                                    <td class="px-6 py-4 text-gray-600">Memperbarui profil</td>
-                                    <td class="px-6 py-4 text-gray-600">17 Jun 2026</td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Sukses</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-medium text-gray-900">Andi Setiawan</td>
-                                    <td class="px-6 py-4 text-gray-600">Gagal reset password</td>
-                                    <td class="px-6 py-4 text-gray-600">16 Jun 2026</td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold">Gagal</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <!-- Recent Activity Section -->
+            <div class="bg-surface rounded-xl border border-outline-variant shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+                <div class="p-space-lg border-b border-outline-variant">
+                    <div class="flex items-center gap-space-md">
+                        <span class="material-symbols-outlined text-on-surface">history</span>
+                        <h2 class="font-headline-sm text-headline-sm text-on-surface">Aktivitas Terbaru</h2>
                     </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-outline-variant bg-surface-container-lowest">
+                                <th scope="col" class="px-space-lg py-space-md text-left font-label-md text-label-md text-secondary uppercase">Nama</th>
+                                <th scope="col" class="px-space-lg py-space-md text-left font-label-md text-label-md text-secondary uppercase">Aktivitas</th>
+                                <th scope="col" class="px-space-lg py-space-md text-left font-label-md text-label-md text-secondary uppercase">Tanggal</th>
+                                <th scope="col" class="px-space-lg py-space-md text-left font-label-md text-label-md text-secondary uppercase">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant">
+                            <tr class="hover:bg-surface-container-lowest transition-colors duration-150">
+                                <td class="px-space-lg py-space-md font-body-md text-on-surface">Budi Santoso</td>
+                                <td class="px-space-lg py-space-md font-body-md text-secondary">Login ke sistem</td>
+                                <td class="px-space-lg py-space-md font-body-md text-secondary">18 Jun 2026</td>
+                                <td class="px-space-lg py-space-md">
+                                    <div class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-success/10 border border-success/20">
+                                        <span class="material-symbols-outlined text-[14px] text-success" data-weight="fill">check_circle</span>
+                                        <span class="font-label-md text-label-md text-success">Sukses</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-surface-container-lowest transition-colors duration-150">
+                                <td class="px-space-lg py-space-md font-body-md text-on-surface">Siti Aminah</td>
+                                <td class="px-space-lg py-space-md font-body-md text-secondary">Memperbarui profil</td>
+                                <td class="px-space-lg py-space-md font-body-md text-secondary">17 Jun 2026</td>
+                                <td class="px-space-lg py-space-md">
+                                    <div class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-success/10 border border-success/20">
+                                        <span class="material-symbols-outlined text-[14px] text-success" data-weight="fill">check_circle</span>
+                                        <span class="font-label-md text-label-md text-success">Sukses</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-surface-container-lowest transition-colors duration-150">
+                                <td class="px-space-lg py-space-md font-body-md text-on-surface">Andi Setiawan</td>
+                                <td class="px-space-lg py-space-md font-body-md text-secondary">Gagal reset password</td>
+                                <td class="px-space-lg py-space-md font-body-md text-secondary">16 Jun 2026</td>
+                                <td class="px-space-lg py-space-md">
+                                    <div class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-error/10 border border-error/20">
+                                        <span class="material-symbols-outlined text-[14px] text-error" data-weight="fill">cancel</span>
+                                        <span class="font-label-md text-label-md text-error">Gagal</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
         </div>
     </main>
-
-</body>
-</html>
+@endsection

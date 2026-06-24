@@ -16,7 +16,7 @@ Route::middleware('guest')->group(function () {
 Route::view('/', 'landing-page');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('/profile', 'profile')->name('profile');
+    Route::view('/edit-profile', 'edit-profile')->name('edit-profile');
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 });
