@@ -1,0 +1,225 @@
+<?php
+
+namespace App\Console\Commands\Stubs;
+
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use App\Console\Commands\Helpers\SchemaHelper;
+
+class TailwindBladeCreateStubGenerator
+{
+    public function generate(string $name, string $label): string
+    {
+        $labelKebab = Str::kebab($label);
+        $columns = SchemaHelper::getTableColumns($name);
+        $exclude = ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'password'];
+        $inputs = '';
+
+        $modelClass = "App\\Models\\$name";
+        $foreignKeys = [];
+        if (class_exists($modelClass)) {
+            $model = new $modelClass;
+            $table = $model->getTable();
+            $sm = Schema::getConnection()->getDoctrineSchemaManager();
+            $doctrineTable = $sm->introspectTable($table);
+            foreach ($doctrineTable->getForeignKeys() as $fk) {
+                foreach ($fk->getLocalColumns() as $localCol) {
+                    $foreignKeys[$localCol] = [
+                        'table' => $fk->getForeignTableName(),
+                        'column' => $fk->getForeignColumns()[0],
+                    ];
+                }
+            }
+        }
+
+        foreach ($columns as $col => $type) {
+            if (in_array($col, $exclude)) {
+                continue;
+            }
+
+            $colLabel = Str::title(str_replace('_', ' ', $col));
+            $field = '';
+
+            if (isset($foreignKeys[$col])) {
+                $relatedTable = $foreignKeys[$col]['table'];
+                $relatedModel = Str::studly(Str::singular($relatedTable));
+                $optionsVar = "\${$relatedTable}";
+                $displayCol = 'name';
+
+                if (class_exists("App\\Models\\$relatedModel")) {
+                    $connection = Schema::getConnection();
+                    $relatedCols = Schema::getColumnListing($relatedTable);
+                    $displayCol = 'id';
+                    foreach ($relatedCols as $rc) {
+                        if ($rc !== 'id') {
+                            $displayCol = $rc;
+                            break;
+                        }
+                    }
+                }
+
+                $field = <<<HTML
+<select id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required @if(isset(\$isView)) disabled @endif>
+  <option value="">-- @lang('Select') --</option>
+  @foreach($optionsVar as \$opt)
+    <option value="{{ \$opt->id }}"
+      {{ (isset(\$item) && \$item->$col == \$opt->id) || old('$col') == \$opt->id ? 'selected' : '' }}>
+      {{ \$opt->$displayCol }}
+    </option>
+  @endforeach
+</select>
+HTML;
+            } else {
+                $field = match ($type) {
+                    'boolean' => $this->generateBooleanField($col),
+                    'text' => $this->generateTextareaField($col),
+                    'date' => $this->generateDateField($col),
+                    'datetime', 'timestamp' => $this->generateDatetimeField($col),
+                    'integer', 'bigint', 'smallint', 'tinyint' => $this->generateNumberField($col),
+                    'float', 'double', 'decimal' => $this->generateDecimalField($col),
+                    default => $this->generateTextField($col),
+                };
+            }
+
+            $inputs .= <<<HTML
+        <div class="mb-4">
+          <label for="$col" class="block text-sm font-medium text-gray-700 dark:text-gray-300">@lang('$colLabel')</label>
+          $field
+          @error('$col')
+            <p class="mt-1 text-sm text-red-500">{{ \$message }}</p>
+          @enderror
+        </div>
+
+HTML;
+        }
+
+        return <<<BLADE
+@extends('layouts.app')
+
+@section('title', __('Create LABEL'))
+
+@section('content')
+<div class="py-12">
+    <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6">
+            <ol class="flex space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <li>
+                    <a href="{{ route('ROUTENAME.index') }}" class="hover:text-gray-900 dark:hover:text-white">
+                        {{ __('LABEL') }}
+                    </a>
+                </li>
+                <li class="text-gray-400">/</li>
+                <li class="text-gray-900 dark:text-white">{{ __('Create') }}</li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                {{ __('Create LABEL') }}
+            </h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">
+                {{ __('Fill in the form below to create a new record') }}
+            </p>
+        </div>
+
+        <!-- Alerts -->
+        @if (\$errors->any())
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded dark:bg-red-900 dark:border-red-600 dark:text-red-100">
+                <h3 class="font-bold">{{ __('Please fix the following errors:') }}</h3>
+                <ul class="mt-2 space-y-1">
+                    @foreach (\$errors->all() as \$error)
+                        <li>{{ \$error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Form Card -->
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+            <form method="POST" action="{{ route('ROUTENAME.store') }}" class="space-y-4">
+                @csrf
+
+                <!-- Fields -->
+{$inputs}
+                <!-- Submit Buttons -->
+                <div class="flex gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-50 transition ease-in-out duration-150">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        {{ __('Create') }}
+                    </button>
+                    <a href="{{ route('ROUTENAME.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 active:bg-gray-400 focus:outline-none focus:border-gray-400 focus:ring ring-gray-300 disabled:opacity-50 transition ease-in-out duration-150 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">
+                        {{ __('Cancel') }}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
+BLADE;
+    }
+
+    private function generateBooleanField(string $col): string
+    {
+        return <<<HTML
+<div class="mt-1 space-y-2">
+  <div class="flex items-center">
+    <input class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" type="radio" id="{$col}_1" name="$col" value="1"
+      @if((isset(\$item) && \$item->$col == 1) || old('$col') == 1) checked @endif>
+    <label class="ml-2 text-sm text-gray-700 dark:text-gray-300" for="{$col}_1">@lang('Yes')</label>
+  </div>
+  <div class="flex items-center">
+    <input class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" type="radio" id="{$col}_0" name="$col" value="0"
+      @if((isset(\$item) && \$item->$col == 0) || old('$col') == 0) checked @endif>
+    <label class="ml-2 text-sm text-gray-700 dark:text-gray-300" for="{$col}_0">@lang('No')</label>
+  </div>
+</div>
+HTML;
+    }
+
+    private function generateTextareaField(string $col): string
+    {
+        return <<<HTML
+<textarea id="$col" name="$col" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required @if(isset(\$isView)) disabled @endif>{{ isset(\$item) ? \$item->$col : old('$col') }}</textarea>
+HTML;
+    }
+
+    private function generateDateField(string $col): string
+    {
+        return <<<HTML
+<input type="date" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generateDatetimeField(string $col): string
+    {
+        return <<<HTML
+<input type="datetime-local" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generateNumberField(string $col): string
+    {
+        return <<<HTML
+<input type="number" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generateDecimalField(string $col): string
+    {
+        return <<<HTML
+<input type="number" step="0.01" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generateTextField(string $col): string
+    {
+        return <<<HTML
+<input type="text" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+}
