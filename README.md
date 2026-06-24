@@ -1,6 +1,6 @@
 # Laravel 13 Boilerplate
 
-A modern, fully-featured Laravel boilerplate built with the latest technologies and best practices. This starter kit includes authentication, email verification, password reset, two-factor authentication, passkeys support, and a complete testing infrastructure.
+A modern, fully-featured Laravel boilerplate built with the latest technologies and best practices. This starter kit includes authentication, email verification, password reset, and a complete testing infrastructure.
 
 ## Features
 
