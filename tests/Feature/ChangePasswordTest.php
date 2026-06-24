@@ -68,3 +68,13 @@ test('change password button appears in topbar dropdown', function () {
     // The dropdown menu is in the page source
     $response->assertSee('Change Password', false);
 });
+
+test('password visibility toggle buttons are present', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/change-password');
+
+    $response->assertStatus(200);
+    $response->assertSee('togglePasswordVisibility');
+    $response->assertSee('visibility');
+});
