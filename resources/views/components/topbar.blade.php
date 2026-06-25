@@ -1,13 +1,16 @@
 <!-- Top Navigation Bar -->
 <nav class="bg-surface border-b border-outline-variant sticky top-0 z-50 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-    <div class="max-w-7xl mx-auto px-gutter h-16 flex items-center justify-between">
+    <div class="px-gutter h-16 flex items-center justify-between">
         <div class="flex items-center gap-space-md">
+            <button id="sidebar-toggle" class="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors duration-200 flex items-center justify-center" title="Toggle Sidebar">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
             @if($showBackButton ?? false)
                 <a href="{{ route('dashboard') }}" class="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors duration-200 flex items-center justify-center" title="Back to Dashboard">
                     <span class="material-symbols-outlined">arrow_back</span>
                 </a>
             @endif
-            <h1 class="font-headline-sm text-headline-sm text-on-surface">{{ $title }}</h1>
+            <h1 class="font-headline-sm text-headline-sm text-on-surface truncate">{{ $title }}</h1>
         </div>
 
         <div class="relative group">

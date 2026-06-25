@@ -4,7 +4,6 @@
 
 @php
     $topbarTitle = 'Edit Profile';
-    $showBackButton = true;
 @endphp
 
 @section('app-content')

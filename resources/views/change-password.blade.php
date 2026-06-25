@@ -4,7 +4,6 @@
 
 @php
     $topbarTitle = 'Change Password';
-    $showBackButton = true;
 @endphp
 
 @section('app-content')
