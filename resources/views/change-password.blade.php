@@ -1,57 +1,57 @@
-@extends('master')
+@extends('layouts.app')
 
 @section('title', 'Change Password')
 
-@section('body_class', 'bg-background text-on-background min-h-screen flex flex-col font-body-md')
+@php
+    $topbarTitle = 'Change Password';
+    $showBackButton = true;
+@endphp
 
-@push('styles')
-    <style>
-        .password-card {
-            position: relative;
-            overflow: hidden;
-        }
+@section('app-content')
+    @push('styles')
+        <style>
+            .password-card {
+                position: relative;
+                overflow: hidden;
+            }
 
-        .password-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(135deg, #004ac6, #2563eb);
-            border-radius: 50%;
-            opacity: 0.05;
-            pointer-events: none;
-        }
+            .password-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 300px;
+                height: 300px;
+                background: linear-gradient(135deg, #004ac6, #2563eb);
+                border-radius: 50%;
+                opacity: 0.05;
+                pointer-events: none;
+            }
 
-        .password-strength {
-            height: 6px;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
+            .password-strength {
+                height: 6px;
+                border-radius: 3px;
+                transition: all 0.3s ease;
+            }
 
-        .password-strength.weak {
-            background-color: rgb(239, 68, 68);
-            width: 33%;
-        }
+            .password-strength.weak {
+                background-color: rgb(239, 68, 68);
+                width: 33%;
+            }
 
-        .password-strength.medium {
-            background-color: rgb(245, 158, 11);
-            width: 66%;
-        }
+            .password-strength.medium {
+                background-color: rgb(245, 158, 11);
+                width: 66%;
+            }
 
-        .password-strength.strong {
-            background-color: rgb(34, 197, 94);
-            width: 100%;
-        }
-    </style>
-@endpush
+            .password-strength.strong {
+                background-color: rgb(34, 197, 94);
+                width: 100%;
+            }
+        </style>
+    @endpush
 
-@section('content')
-    <x-topbar title="Change Password" :showBackButton="true" />
-
-    <!-- Main Content -->
-    <main class="flex-grow flex items-center justify-center py-space-xl px-gutter">
+    <div class="flex items-center justify-center py-space-xl px-gutter">
         <div class="bg-surface w-full max-w-2xl rounded-xl border border-outline-variant p-space-lg md:p-space-xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-shadow duration-200 password-card">
             <div class="relative z-10">
                 <h2 class="font-headline-lg text-headline-lg text-on-surface mb-space-xs">Change Password</h2>
@@ -175,8 +175,7 @@
                     </div>
                 </form>
             </div>
-        </div>
-    </main>
+    </div>
 
     @push('scripts')
         <script>

@@ -1,36 +1,36 @@
-@extends('master')
+@extends('layouts.app')
 
 @section('title', 'Edit Profile')
 
-@section('body_class', 'bg-background text-on-background min-h-screen flex flex-col font-body-md')
+@php
+    $topbarTitle = 'Edit Profile';
+    $showBackButton = true;
+@endphp
 
-@push('styles')
-    <style>
-        .profile-card {
-            position: relative;
-            overflow: hidden;
-        }
+@section('app-content')
+    @push('styles')
+        <style>
+            .profile-card {
+                position: relative;
+                overflow: hidden;
+            }
 
-        .profile-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(135deg, #004ac6, #2563eb);
-            border-radius: 50%;
-            opacity: 0.05;
-            pointer-events: none;
-        }
-    </style>
-@endpush
+            .profile-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 300px;
+                height: 300px;
+                background: linear-gradient(135deg, #004ac6, #2563eb);
+                border-radius: 50%;
+                opacity: 0.05;
+                pointer-events: none;
+            }
+        </style>
+    @endpush
 
-@section('content')
-    <x-topbar title="Edit Profile" :showBackButton="true" />
-
-    <!-- Main Content -->
-    <main class="flex-grow flex items-center justify-center py-space-xl px-gutter">
+    <div class="flex items-center justify-center py-space-xl px-gutter">
         <div class="bg-surface w-full max-w-2xl rounded-xl border border-outline-variant p-space-lg md:p-space-xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-shadow duration-200 profile-card">
             <div class="relative z-10">
                 <h2 class="font-headline-lg text-headline-lg text-on-surface mb-space-xs">Edit Profile</h2>
@@ -122,6 +122,5 @@
                     </div>
                 </form>
             </div>
-        </div>
-    </main>
+    </div>
 @endsection

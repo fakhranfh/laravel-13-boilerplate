@@ -100,7 +100,11 @@ HTML;
 
 @section('title', \$item->{$firstCol} ?? __('View LABEL'))
 
-@section('content')
+@php
+    \$topbarTitle = \$item->{$firstCol} ?? __('View LABEL');
+@endphp
+
+@section('app-content')
 <div class="py-12">
     <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
         <!-- Breadcrumb -->

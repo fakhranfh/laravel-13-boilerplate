@@ -1,15 +1,13 @@
-@extends('master')
+@extends('layouts.app')
 
 @section('title', 'Dashboard')
 
-@section('body_class', 'bg-background text-on-background min-h-screen flex flex-col font-body-md')
+@php
+    $topbarTitle = 'Dashboard';
+@endphp
 
-@section('content')
-    <x-topbar title="Dashboard" />
-
-    <!-- Main Content -->
-    <main class="flex-grow py-space-lg px-gutter">
-        <div class="max-w-7xl mx-auto space-y-space-lg">
+@section('app-content')
+    <div class="space-y-space-lg">
 
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
@@ -123,6 +121,5 @@
                 </div>
             </div>
 
-        </div>
-    </main>
+    </div>
 @endsection
