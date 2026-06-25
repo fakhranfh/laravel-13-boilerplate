@@ -65,20 +65,32 @@ class RouteGenerator
 
     PHP;
 
-        $pattern = '/Route::middleware\(\s*\[\s*[\'"]auth[\'"]\s*,\s*[\'"]syncAcademicYear[\'"]\s*]\s*\)->group\(function\s*\(\)\s*{([\s\S]*?)^}\);/m';
+        $pattern = '/Route::middleware\(\s*\[([^\]]*)\]\s*\)->group\(function\s*\(\)\s*{([\s\S]*?)^}\);/m';
         if (preg_match($pattern, $webRouteContent, $matches, PREG_OFFSET_CAPTURE)) {
-            $groupBody = $matches[1][0];
+            $middlewareArray = $matches[1][0];
+            $groupBody = $matches[2][0];
 
-            if (strpos($groupBody, "[App\Http\Controllers\\{$name}Controller::class") === false && strpos($groupBody, "{$name}Controller") === false) {
-                $insertPos = $matches[1][1] + strlen($groupBody);
-                $newContent = substr($webRouteContent, 0, $insertPos) . $routeStub . substr($webRouteContent, $insertPos);
-                $this->filesystem->put($webRoutePath, $newContent);
-                $callback("Resource route for {$name} appended to routes/web.php.", 'info');
-            } else {
-                $callback("Route for {$name} already exists in routes/web.php. Skipping append.", 'warn');
+            if (strpos($middlewareArray, 'auth') !== false) {
+                if (strpos($groupBody, "[App\Http\Controllers\\{$name}Controller::class") === false && strpos($groupBody, "{$name}Controller") === false) {
+                    $insertPos = $matches[2][1] + strlen($groupBody);
+                    $newContent = substr($webRouteContent, 0, $insertPos) . $routeStub . substr($webRouteContent, $insertPos);
+                    $this->filesystem->put($webRoutePath, $newContent);
+                    $callback("Resource route for {$name} appended to routes/web.php.", 'info');
+                } else {
+                    $callback("Route for {$name} already exists in routes/web.php. Skipping append.", 'warn');
+                }
+                return;
             }
-        } else {
-            $callback("Could not find Route::middleware(['auth', 'syncAcademicYear'])->group() in routes/web.php. Please add the following route manually:\n" . $routeStub, 'warn');
         }
+
+        $middlewareGroup = <<<PHP
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('{$routeName}', {$name}Controller::class);
+});
+PHP;
+        $newContent = $webRouteContent . "\n" . $middlewareGroup;
+        $this->filesystem->put($webRoutePath, $newContent);
+        $callback("Route::middleware(['auth'])->group() not found. Created new middleware group with {$name} resource route.", 'info');
     }
 }
