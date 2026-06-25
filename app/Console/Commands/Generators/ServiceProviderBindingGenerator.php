@@ -63,15 +63,28 @@ class ServiceProviderBindingGenerator
             return;
         }
 
-        $pattern = '/public function register\(\): void\s*\{([\s\S]*?)\}/m';
-        if (preg_match($pattern, $content, $matches, PREG_OFFSET_CAPTURE)) {
-            $registerBody = $matches[1][0];
-            $insertPos = $matches[1][1] + strlen($registerBody);
-            $newContent = substr($content, 0, $insertPos) . "  {$bindLine}\n" . substr($content, $insertPos);
-            $this->filesystem->put($appServiceProviderPath, $newContent);
-            $callback("Binding for {$interface} added to AppServiceProvider.", 'info');
-        } else {
+        $pattern = '/public function register\(\): void\s*\{/';
+        if (!preg_match($pattern, $content, $matches, PREG_OFFSET_CAPTURE)) {
             $callback("Could not find register() method in AppServiceProvider. Please add the following manually:\n{$bindLine}", 'warn');
+            return;
         }
+
+        $methodStart = $matches[0][1] + strlen($matches[0][0]);
+        $braceCount = 1;
+        $pos = $methodStart;
+
+        while ($braceCount > 0 && $pos < strlen($content)) {
+            if ($content[$pos] === '{') {
+                $braceCount++;
+            } elseif ($content[$pos] === '}') {
+                $braceCount--;
+            }
+            $pos++;
+        }
+
+        $insertPos = $pos - 1;
+        $newContent = substr($content, 0, $insertPos) . "\n        {$bindLine}" . substr($content, $insertPos);
+        $this->filesystem->put($appServiceProviderPath, $newContent);
+        $callback("Binding for {$interface} added to AppServiceProvider.", 'info');
     }
 }
