@@ -18,17 +18,24 @@ class TailwindBladeShowStubGenerator
         $modelClass = "App\\Models\\$name";
         $foreignKeys = [];
         if (class_exists($modelClass)) {
-            $model = new $modelClass;
-            $table = $model->getTable();
-            $sm = Schema::getConnection()->getDoctrineSchemaManager();
-            $doctrineTable = $sm->introspectTable($table);
-            foreach ($doctrineTable->getForeignKeys() as $fk) {
-                foreach ($fk->getLocalColumns() as $localCol) {
-                    $foreignKeys[$localCol] = [
-                        'table' => $fk->getForeignTableName(),
-                        'column' => $fk->getForeignColumns()[0],
-                    ];
+            try {
+                $model = new $modelClass;
+                $table = $model->getTable();
+                $connection = Schema::getConnection();
+                if (method_exists($connection, 'getDoctrineSchemaManager')) {
+                    $sm = $connection->getDoctrineSchemaManager();
+                    $doctrineTable = $sm->introspectTable($table);
+                    foreach ($doctrineTable->getForeignKeys() as $fk) {
+                        foreach ($fk->getLocalColumns() as $localCol) {
+                            $foreignKeys[$localCol] = [
+                                'table' => $fk->getForeignTableName(),
+                                'column' => $fk->getForeignColumns()[0],
+                            ];
+                        }
+                    }
                 }
+            } catch (\Exception $e) {
+                // Silently fail foreign key detection
             }
         }
 
@@ -68,18 +75,19 @@ class TailwindBladeShowStubGenerator
 
 HTML;
             } else {
-                $displayValue = match ($type) {
-                    'boolean' => "{{ \$item->$col ? __('Yes') : __('No') }}",
-                    'date' => "{{ \$item->$col?->format('d M Y') }}",
-                    'datetime', 'timestamp' => "{{ \$item->$col?->format('d M Y H:i') }}",
-                    default => "{{ \$item->$col }}",
-                };
+                if ($type === 'boolean') {
+                    $displayValue = '{{ $item->' . $col . ' ? __(\'Yes\') : __(\'No\') }}';
+                } elseif (in_array($type, ['date', 'datetime', 'timestamp'])) {
+                    $displayValue = '{{ $item->' . $col . '?->format(\'d M Y H:i\') ?? $item->' . $col . ' }}';
+                } else {
+                    $displayValue = '{{ $item->' . $col . ' }}';
+                }
 
                 $fields .= <<<HTML
         <div class="border-t border-gray-200 dark:border-gray-700 py-4">
           <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">@lang('$colLabel')</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-            {$displayValue}
+            $displayValue
           </dd>
         </div>
 

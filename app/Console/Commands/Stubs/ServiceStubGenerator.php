@@ -37,9 +37,9 @@ class {$name}Service
         return \$this->{$camelCaseName}Repository->getAll();
     }
 
-    public function findById(\$id)
+    public function find(\$id)
     {
-        return \$this->{$camelCaseName}Repository->findById(\$id);
+        return \$this->{$camelCaseName}Repository->find(\$id);
     }
 
     public function create(array \$data)

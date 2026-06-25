@@ -18,17 +18,24 @@ class TailwindBladeCreateStubGenerator
         $modelClass = "App\\Models\\$name";
         $foreignKeys = [];
         if (class_exists($modelClass)) {
-            $model = new $modelClass;
-            $table = $model->getTable();
-            $sm = Schema::getConnection()->getDoctrineSchemaManager();
-            $doctrineTable = $sm->introspectTable($table);
-            foreach ($doctrineTable->getForeignKeys() as $fk) {
-                foreach ($fk->getLocalColumns() as $localCol) {
-                    $foreignKeys[$localCol] = [
-                        'table' => $fk->getForeignTableName(),
-                        'column' => $fk->getForeignColumns()[0],
-                    ];
+            try {
+                $model = new $modelClass;
+                $table = $model->getTable();
+                $connection = Schema::getConnection();
+                if (method_exists($connection, 'getDoctrineSchemaManager')) {
+                    $sm = $connection->getDoctrineSchemaManager();
+                    $doctrineTable = $sm->introspectTable($table);
+                    foreach ($doctrineTable->getForeignKeys() as $fk) {
+                        foreach ($fk->getLocalColumns() as $localCol) {
+                            $foreignKeys[$localCol] = [
+                                'table' => $fk->getForeignTableName(),
+                                'column' => $fk->getForeignColumns()[0],
+                            ];
+                        }
+                    }
                 }
+            } catch (\Exception $e) {
+                // Silently fail foreign key detection
             }
         }
 

@@ -68,12 +68,21 @@ class FormRequestGenerator
             return 'nullable';
         }
 
-        $model = new $modelClass;
-        $table = $model->getTable();
-        $columnInfo = Schema::getConnection()->getDoctrineColumn($table, $col);
-        $nullable = $columnInfo->getNotnull() ? false : true;
+        try {
+            $model = new $modelClass;
+            $table = $model->getTable();
+            $connection = Schema::getConnection();
 
-        return $nullable ? 'nullable' : 'required';
+            if (!method_exists($connection, 'getDoctrineColumn')) {
+                return 'required';
+            }
+
+            $columnInfo = $connection->getDoctrineColumn($table, $col);
+            $nullable = $columnInfo->getNotnull() ? false : true;
+            return $nullable ? 'nullable' : 'required';
+        } catch (\Exception $e) {
+            return 'required';
+        }
     }
 
     private function getForeignKeyRule(string $name, string $col): ?string
@@ -83,17 +92,27 @@ class FormRequestGenerator
             return null;
         }
 
-        $model = new $modelClass;
-        $table = $model->getTable();
-        $sm = Schema::getConnection()->getDoctrineSchemaManager();
-        $doctrineTable = $sm->introspectTable($table);
+        try {
+            $model = new $modelClass;
+            $table = $model->getTable();
+            $connection = Schema::getConnection();
 
-        foreach ($doctrineTable->getForeignKeys() as $fk) {
-            if (in_array($col, $fk->getLocalColumns())) {
-                $foreignTable = $fk->getForeignTableName();
-                $foreignColumn = $fk->getForeignColumns()[0];
-                return "exists:$foreignTable,$foreignColumn";
+            if (!method_exists($connection, 'getDoctrineSchemaManager')) {
+                return null;
             }
+
+            $sm = $connection->getDoctrineSchemaManager();
+            $doctrineTable = $sm->introspectTable($table);
+
+            foreach ($doctrineTable->getForeignKeys() as $fk) {
+                if (in_array($col, $fk->getLocalColumns())) {
+                    $foreignTable = $fk->getForeignTableName();
+                    $foreignColumn = $fk->getForeignColumns()[0];
+                    return "exists:$foreignTable,$foreignColumn";
+                }
+            }
+        } catch (\Exception $e) {
+            return null;
         }
 
         return null;

@@ -57,7 +57,7 @@ class {$name}Controller extends Controller
 
     public function show(\$id)
     {
-        \$item = \$this->{$camelCaseName}Service->findById(\$id);
+        \$item = \$this->{$camelCaseName}Service->find(\$id);
         \$foreignData = \$this->foreignData();
 
         return view('{$viewPath}.{$kebabCaseName}.show', [
@@ -78,7 +78,7 @@ class {$name}Controller extends Controller
 
     public function edit(\$id)
     {
-        \$item = \$this->{$camelCaseName}Service->findById(\$id);
+        \$item = \$this->{$camelCaseName}Service->find(\$id);
         \$foreignData = \$this->foreignData();
 
         return view('{$viewPath}.{$kebabCaseName}.edit', [
@@ -105,26 +105,35 @@ PHP;
     {
         $foreignKeys = [];
         if (class_exists($modelClass)) {
-            $model = new $modelClass;
-            $table = $model->getTable();
-            $connection = Schema::getConnection();
-            $doctrineConn = $connection->getDoctrineConnection();
-            if (!\Doctrine\DBAL\Types\Type::hasType('enum')) {
-                \Doctrine\DBAL\Types\Type::addType('enum', \Doctrine\DBAL\Types\StringType::class);
-            }
-            $platform = $doctrineConn->getDatabasePlatform();
-            if (method_exists($platform, 'registerDoctrineTypeMapping')) {
-                $platform->registerDoctrineTypeMapping('enum', 'string');
-            }
-            $sm = $connection->getDoctrineSchemaManager();
-            $doctrineTable = $sm->introspectTable($table);
-            foreach ($doctrineTable->getForeignKeys() as $fk) {
-                foreach ($fk->getLocalColumns() as $localCol) {
-                    $foreignKeys[$localCol] = [
-                        'table' => $fk->getForeignTableName(),
-                        'column' => $fk->getForeignColumns()[0],
-                    ];
+            try {
+                $model = new $modelClass;
+                $table = $model->getTable();
+                $connection = Schema::getConnection();
+
+                if (!method_exists($connection, 'getDoctrineConnection')) {
+                    return $foreignKeys;
                 }
+
+                $doctrineConn = $connection->getDoctrineConnection();
+                if (!\Doctrine\DBAL\Types\Type::hasType('enum')) {
+                    \Doctrine\DBAL\Types\Type::addType('enum', \Doctrine\DBAL\Types\StringType::class);
+                }
+                $platform = $doctrineConn->getDatabasePlatform();
+                if (method_exists($platform, 'registerDoctrineTypeMapping')) {
+                    $platform->registerDoctrineTypeMapping('enum', 'string');
+                }
+                $sm = $connection->getDoctrineSchemaManager();
+                $doctrineTable = $sm->introspectTable($table);
+                foreach ($doctrineTable->getForeignKeys() as $fk) {
+                    foreach ($fk->getLocalColumns() as $localCol) {
+                        $foreignKeys[$localCol] = [
+                            'table' => $fk->getForeignTableName(),
+                            'column' => $fk->getForeignColumns()[0],
+                        ];
+                    }
+                }
+            } catch (\Exception $e) {
+                return $foreignKeys;
             }
         }
         return $foreignKeys;
