@@ -18,8 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-    Route::get('product/data/list', [ProductController::class, 'list'])->name('product.list');
-    });
+});
 
 Route::post('/logout', function (Request $request) {
     auth()->logout();

@@ -2,31 +2,37 @@
 
 namespace App\Console\Commands\Generators;
 
-use Illuminate\Filesystem\Filesystem;
 use App\Console\Commands\Stubs\ControllerStubGenerator;
+use Illuminate\Filesystem\Filesystem;
 
 class ControllerGenerator
 {
     private Filesystem $filesystem;
+
     private ControllerStubGenerator $stubGenerator;
 
     public function __construct()
     {
-        $this->filesystem = new Filesystem();
-        $this->stubGenerator = new ControllerStubGenerator();
+        $this->filesystem = new Filesystem;
+        $this->stubGenerator = new ControllerStubGenerator;
     }
 
-    public function generate(string $name, string $label, string $viewPath, callable $callback): void
+    public function generate(string $name, string $label, string $viewPath = 'app', ?callable $callback = null): void
     {
         $controllerPath = app_path("Http/Controllers/{$name}Controller.php");
 
         $this->filesystem->ensureDirectoryExists(app_path('Http/Controllers'));
 
-        if (!$this->filesystem->exists($controllerPath)) {
-            $this->filesystem->put($controllerPath, $this->stubGenerator->generate($name, $label, $viewPath));
-            $callback("Controller created: {$controllerPath}", 'info');
+        if (! $this->filesystem->exists($controllerPath)) {
+            $content = $this->stubGenerator->generate($name, $label, $viewPath);
+            $this->filesystem->put($controllerPath, $content);
+            if (is_callable($callback)) {
+                $callback("Controller created: {$controllerPath}", 'info');
+            }
         } else {
-            $callback("Controller already exists: {$controllerPath}", 'warn');
+            if (is_callable($callback)) {
+                $callback("Controller already exists: {$controllerPath}", 'warn');
+            }
         }
     }
 }

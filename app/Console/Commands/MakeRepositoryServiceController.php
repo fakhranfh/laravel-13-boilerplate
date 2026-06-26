@@ -64,12 +64,23 @@ class MakeRepositoryServiceController extends Command
             $this->generateBladeViews($name, $label, $viewPath);
             $this->generateRoutes($name, $label);
 
+            // Clear cache after routes change
+            Artisan::call('route:clear');
+            $this->info('Route cache cleared.');
+
             Artisan::call('optimize');
             $this->info('php artisan optimize executed.');
+
+            $this->info('');
+            $this->info('<fg=green>✓ Generation completed successfully!</>');
+            $this->info('Route names:');
+            $this->info("  - {$label} Index: <comment>".Str::kebab($label).'.index</comment>');
+            $this->info("  - {$label} List (DataTables API): <comment>".Str::kebab($label).'.list</comment>');
 
             return 0;
         } catch (\Exception $e) {
             $this->error("Error occurred: {$e->getMessage()}");
+            $this->error('Stack trace: '.$e->getTraceAsString());
             $this->warn('Cleaning up generated files...');
             $this->cleanupGeneratedFiles($name ?? null, $viewPath ?? 'app');
             $this->error('Generation failed and files have been cleaned up.');
@@ -104,10 +115,16 @@ class MakeRepositoryServiceController extends Command
 
     private function generateController(string $name, string $label, string $viewPath = 'app'): void
     {
-        $generator = new ControllerGenerator;
-        $generator->generate($name, $label, $viewPath, function (string $message, string $type) {
-            $this->$type($message);
-        });
+        try {
+            $generator = new ControllerGenerator;
+            $generator->generate($name, $label, $viewPath, function (string $message, string $type) {
+                $this->$type($message);
+            });
+            $this->info("✓ Controller with DataTables list() method generated for {$name}");
+        } catch (\Exception $e) {
+            $this->error("Failed to generate controller: {$e->getMessage()}");
+            throw $e;
+        }
     }
 
     private function generateFormRequests(string $name): void
@@ -310,21 +327,21 @@ class MakeRepositoryServiceController extends Command
             $this->info("  Precision: {$column['precision']} | Scale: {$column['scale']}");
         }
         if (isset($column['values'])) {
-            $this->info("  Values: ".implode(', ', $column['values']));
+            $this->info('  Values: '.implode(', ', $column['values']));
         }
-        $this->info("  Nullable: ".($column['nullable'] ? 'Yes' : 'No'));
+        $this->info('  Nullable: '.($column['nullable'] ? 'Yes' : 'No'));
         if (isset($column['default'])) {
             $this->info("  Default: {$column['default']}");
         }
         if (isset($column['index'])) {
-            $this->info("  Index: ".($column['index'] ? 'Yes' : 'No'));
+            $this->info('  Index: '.($column['index'] ? 'Yes' : 'No'));
         }
         if (isset($column['unique'])) {
-            $this->info("  Unique: ".($column['unique'] ? 'Yes' : 'No'));
+            $this->info('  Unique: '.($column['unique'] ? 'Yes' : 'No'));
         }
         $this->info("  Input Type: {$column['input_type']}");
 
-        if (!$this->confirm('Confirm column configuration?', true)) {
+        if (! $this->confirm('Confirm column configuration?', true)) {
             $this->warn("Column '{$columnName}' discarded.");
 
             return null;
