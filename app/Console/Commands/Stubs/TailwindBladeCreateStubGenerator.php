@@ -65,6 +65,11 @@ class TailwindBladeCreateStubGenerator
                 continue;
             }
 
+            // Skip field if input type is 'skip'
+            if (isset($columnInputTypes[$col]) && $columnInputTypes[$col] === 'skip') {
+                continue;
+            }
+
             $colLabel = Str::title(str_replace('_', ' ', $col));
             $field = '';
 

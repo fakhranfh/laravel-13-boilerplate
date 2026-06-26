@@ -147,13 +147,27 @@ class MakeRepositoryServiceController extends Command
         $columns = [];
 
         $this->info('Define your table columns (type "done" when finished):');
+        $this->info('Tip: You can type "back" in most prompts to undo the last column');
 
         while (true) {
             $this->newLine();
-            $columnName = $this->ask('Column name (or "done" to finish)');
+            $columnName = $this->ask('Column name (or "done" to finish, "back" to remove last column)');
 
             if (strtolower($columnName) === 'done') {
                 break;
+            }
+
+            if (strtolower($columnName) === 'back') {
+                if (empty($columns)) {
+                    $this->warn('No columns to remove.');
+
+                    continue;
+                }
+
+                $removed = array_pop($columns);
+                $this->warn("Column '{$removed['name']}' removed.");
+
+                continue;
             }
 
             if (empty($columnName)) {
@@ -162,69 +176,12 @@ class MakeRepositoryServiceController extends Command
                 continue;
             }
 
-            $columnType = $this->choice(
-                'Column type',
-                [
-                    'string',
-                    'integer',
-                    'bigInteger',
-                    'smallInteger',
-                    'decimal',
-                    'float',
-                    'boolean',
-                    'text',
-                    'longText',
-                    'date',
-                    'dateTime',
-                    'timestamp',
-                    'json',
-                    'enum',
-                ]
-            );
-
-            $column = [
-                'name' => $columnName,
-                'type' => $columnType,
-            ];
-
-            // Type-specific options
-            if ($columnType === 'string') {
-                $length = $this->ask('String length (press Enter for default 255)', 255);
-                $column['length'] = (int) $length;
-            } elseif ($columnType === 'decimal') {
-                $precision = $this->ask('Precision (total digits)', 8);
-                $scale = $this->ask('Scale (decimal places)', 2);
-                $column['precision'] = (int) $precision;
-                $column['scale'] = (int) $scale;
-            } elseif ($columnType === 'enum') {
-                $values = $this->ask('Enum values (comma-separated)');
-                $column['values'] = array_map('trim', explode(',', $values));
+            $columnDetails = $this->askColumnDetails($columnName);
+            if ($columnDetails === null) {
+                continue;
             }
 
-            // Common options
-            $column['nullable'] = $this->confirm('Nullable?', false);
-
-            if ($this->confirm('Add default value?', false)) {
-                $default = $this->ask('Default value');
-                if ($columnType === 'boolean') {
-                    $column['default'] = strtolower($default) === 'true' || $default === '1';
-                } else {
-                    $column['default'] = $default;
-                }
-            }
-
-            if ($columnType !== 'json' && $columnType !== 'text' && $columnType !== 'longText') {
-                $column['index'] = $this->confirm('Add index?', false);
-            }
-
-            if ($columnType === 'string') {
-                $column['unique'] = $this->confirm('Add unique constraint?', false);
-            }
-
-            // Ask for form input type
-            $column['input_type'] = $this->askForInputType($columnType, $columnName);
-
-            $columns[] = $column;
+            $columns[] = $columnDetails;
             $this->info("<fg=green>✓ Column '{$columnName}' added</>");
         }
 
@@ -270,6 +227,112 @@ class MakeRepositoryServiceController extends Command
         }
     }
 
+    private function askColumnDetails(string $columnName): ?array
+    {
+        $column = [
+            'name' => $columnName,
+        ];
+
+        // Ask for column type
+        $typeOptions = [
+            'string',
+            'integer',
+            'bigInteger',
+            'smallInteger',
+            'decimal',
+            'float',
+            'boolean',
+            'text',
+            'longText',
+            'date',
+            'dateTime',
+            'timestamp',
+            'json',
+            'enum',
+        ];
+
+        $columnType = $this->choice(
+            'Column type',
+            $typeOptions
+        );
+
+        if ($columnType === null) {
+            return null;
+        }
+
+        $column['type'] = $columnType;
+
+        // Type-specific options
+        if ($columnType === 'string') {
+            $length = $this->ask('String length (press Enter for default 255)', 255);
+            $column['length'] = (int) $length;
+        } elseif ($columnType === 'decimal') {
+            $precision = $this->ask('Precision (total digits)', 8);
+            $scale = $this->ask('Scale (decimal places)', 2);
+            $column['precision'] = (int) $precision;
+            $column['scale'] = (int) $scale;
+        } elseif ($columnType === 'enum') {
+            $values = $this->ask('Enum values (comma-separated)');
+            $column['values'] = array_map('trim', explode(',', $values));
+        }
+
+        // Common options
+        $column['nullable'] = $this->confirm('Nullable?', false);
+
+        if ($this->confirm('Add default value?', false)) {
+            $default = $this->ask('Default value');
+            if ($columnType === 'boolean') {
+                $column['default'] = strtolower($default) === 'true' || $default === '1';
+            } else {
+                $column['default'] = $default;
+            }
+        }
+
+        if ($columnType !== 'json' && $columnType !== 'text' && $columnType !== 'longText') {
+            $column['index'] = $this->confirm('Add index?', false);
+        }
+
+        if ($columnType === 'string') {
+            $column['unique'] = $this->confirm('Add unique constraint?', false);
+        }
+
+        // Ask for form input type
+        $column['input_type'] = $this->askForInputType($columnType, $columnName);
+
+        // Verify column configuration
+        $this->newLine();
+        $this->info("Column configuration for '{$columnName}':");
+        $this->info("  Type: {$column['type']}");
+        if (isset($column['length'])) {
+            $this->info("  Length: {$column['length']}");
+        }
+        if (isset($column['precision'])) {
+            $this->info("  Precision: {$column['precision']} | Scale: {$column['scale']}");
+        }
+        if (isset($column['values'])) {
+            $this->info("  Values: ".implode(', ', $column['values']));
+        }
+        $this->info("  Nullable: ".($column['nullable'] ? 'Yes' : 'No'));
+        if (isset($column['default'])) {
+            $this->info("  Default: {$column['default']}");
+        }
+        if (isset($column['index'])) {
+            $this->info("  Index: ".($column['index'] ? 'Yes' : 'No'));
+        }
+        if (isset($column['unique'])) {
+            $this->info("  Unique: ".($column['unique'] ? 'Yes' : 'No'));
+        }
+        $this->info("  Input Type: {$column['input_type']}");
+
+        if (!$this->confirm('Confirm column configuration?', true)) {
+            $this->warn("Column '{$columnName}' discarded.");
+
+            return null;
+        }
+
+        return $column;
+    }
+
     private function askForInputType(string $columnType, string $columnName): string
     {
         $inputTypeOptions = $this->getInputTypeOptionsForColumnType($columnType);
@@ -282,7 +345,7 @@ class MakeRepositoryServiceController extends Command
 
     private function getInputTypeOptionsForColumnType(string $columnType): array
     {
-        return match ($columnType) {
+        $options = match ($columnType) {
             'boolean' => ['radio', 'checkbox'],
             'text', 'longText' => ['textarea'],
             'date' => ['date'],
@@ -294,6 +357,8 @@ class MakeRepositoryServiceController extends Command
             'string' => ['text', 'email', 'password', 'url', 'tel'],
             default => ['text'],
         };
+
+        return array_merge(['skip'], $options);
     }
 
     private function configureFormInputTypes(string $name): void
@@ -308,6 +373,7 @@ class MakeRepositoryServiceController extends Command
         }
 
         $this->info('Configure form input types for columns:');
+        $this->info('Tip: You can change input type if you make a mistake');
         $columns = Schema::getColumnListing($tableName);
         $exclude = ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'password'];
 
@@ -320,14 +386,22 @@ class MakeRepositoryServiceController extends Command
             }
         }
 
-        // Ask for input type for each column
+        // Ask for input type for each column with confirmation
         foreach ($columnTypes as $col => $type) {
             $colLabel = Str::title(str_replace('_', ' ', $col));
-            $inputType = $this->choice(
-                "Input type for '{$colLabel}' field",
-                $this->getInputTypeOptionsForColumnType($type)
-            );
-            $this->columnInputTypes[$col] = $inputType;
+
+            while (true) {
+                $inputType = $this->choice(
+                    "Input type for '{$colLabel}' field",
+                    $this->getInputTypeOptionsForColumnType($type)
+                );
+
+                if ($this->confirm("Set input type to '{$inputType}' for '{$colLabel}'?", true)) {
+                    $this->columnInputTypes[$col] = $inputType;
+
+                    break;
+                }
+            }
         }
     }
 
