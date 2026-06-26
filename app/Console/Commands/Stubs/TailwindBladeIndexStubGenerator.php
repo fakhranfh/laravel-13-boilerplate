@@ -9,15 +9,15 @@ class TailwindBladeIndexStubGenerator
     public function generate(string $name, string $label): string
     {
         $labelKebab = Str::kebab($label);
-        $pluralTitle = $label;
+        $tableId = lcfirst(str_replace('-', '', ucwords($labelKebab, '-'))) . 'Table';
 
-        return <<<'BLADE'
+        return <<<BLADE
 @extends('layouts.app')
 
 @section('title', __('LABEL'))
 
 @php
-    $topbarTitle = __('LABEL');
+    \$topbarTitle = __('LABEL');
 @endphp
 
 @section('app-content')
@@ -35,9 +35,7 @@ class TailwindBladeIndexStubGenerator
             </div>
             <a href="{{ route('ROUTENAME.create') }}"
                 class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-50 transition ease-in-out duration-150">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 9.414V17a1 1 0 11-2 0V9.414L7.707 10.707a1 1 0 01-1.414-1.414l4-4z" clip-rule="evenodd" />
-                </svg>
+                <span class="mr-2 font-bold text-lg">+</span>
                 {{ __('New LABEL') }}
             </a>
         </div>
@@ -55,114 +53,62 @@ class TailwindBladeIndexStubGenerator
             </div>
         @endif
 
-        <!-- Table Card -->
-        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    {{ __('All LABEL') }}
-                </h3>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-gray-700 dark:text-gray-300 display" id="ROUTENAME-table">
-                    <thead class="bg-gray-100 dark:bg-gray-700">
-                        <tr>
-                            <th class="px-6 py-3 text-left font-semibold">{{ __('ID') }}</th>
-                            <th class="px-6 py-3 text-left font-semibold">{{ __('Name') }}</th>
-                            <th class="px-6 py-3 text-left font-semibold">{{ __('Created') }}</th>
-                            <th class="px-6 py-3 text-right font-semibold">{{ __('Actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <x-data-table
+            title="{{ __('All LABEL') }}"
+            tableId="{$tableId}"
+            listUrl="{{ route('ROUTENAME.list') }}">
+            <x-slot name="headers">
+                <th class="px-6 py-3 text-left font-semibold">{{ __('ID') }}</th>
+                <th class="px-6 py-3 text-left font-semibold">{{ __('Name') }}</th>
+                <th class="px-6 py-3 text-left font-semibold">{{ __('Created') }}</th>
+                <th class="px-6 py-3 text-right font-semibold">{{ __('Actions') }}</th>
+            </x-slot>
+        </x-data-table>
     </div>
 </div>
 
-@push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
-@endpush
+<x-success-modal />
+
+<x-confirm-modal
+    id="confirmDeleteModal"
+    title="{{ __('Are you sure?') }}"
+    message="{{ __('This action cannot be undone.') }}"
+    cancelLabel="{{ __('Cancel') }}"
+    confirmLabel="{{ __('Delete') }}"
+    iconBgColor="red"
+    confirmBtnColor="red">
+    <x-slot name="icon">
+        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+    </x-slot>
+</x-confirm-modal>
+
+<x-modal-scripts />
+<x-data-table-scripts />
 
 @push('scripts')
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const table = document.getElementById('ROUTENAME-table');
-            if (table) {
-                const dataTable = new DataTable('#ROUTENAME-table', {
-                    ajax: {
-                        url: '{{ route("ROUTENAME.list") }}',
-                        type: 'GET',
-                        dataSrc: 'data',
-                        error: function(xhr, error, thrown) {
-                            console.error('DataTables AJAX Error:', {
-                                error: error,
-                                thrown: thrown,
-                                response: xhr.responseJSON
-                            });
-                        }
-                    },
-                    columns: [
-                        { data: 'id', title: '{{ __("ID") }}' },
-                        { data: 'name', title: '{{ __("Name") }}' },
-                        { data: 'created_at', title: '{{ __("Created") }}' },
-                        {
-                            data: 'actions',
-                            title: '{{ __("Actions") }}',
-                            orderable: false,
-                            searchable: false,
-                            render: function(data) {
-                                if (!data) return '';
-                                return `
-                                    <div class="flex gap-2 justify-end">
-                                        <a href="${data.show}" class="text-blue-600 hover:text-blue-900 text-sm font-medium">{{ __('View') }}</a>
-                                        <a href="${data.edit}" class="text-amber-600 hover:text-amber-900 text-sm font-medium">{{ __('Edit') }}</a>
-                                        <button onclick="deleteItem('${data.delete}')" class="text-red-600 hover:text-red-900 text-sm font-medium">{{ __('Delete') }}</button>
-                                    </div>
-                                `;
-                            }
-                        }
-                    ],
-                    order: [[0, 'desc']],
-                    pageLength: 10,
-                    processing: true,
-                    serverSide: false,
-                    initComplete: function() {
-                        console.log('DataTable initialized successfully for ROUTENAME');
-                    }
-                });
-            }
-
-            window.deleteItem = function(url) {
-                if (!confirm('{{ __("Are you sure?") }}')) return;
-
-                const csrfToken = document.querySelector('meta[name="csrf-token"]');
-                if (!csrfToken) {
-                    alert('{{ __("Security error: CSRF token not found") }}');
-                    return;
-                }
-
-                fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken.content,
-                        'Accept': 'application/json'
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        throw new Error('Delete failed with status ' + response.status);
-                    }
-                }).catch(error => {
-                    console.error('Delete error:', error);
-                    alert('{{ __("Failed to delete item") }}');
-                });
-            };
-        });
-    </script>
+<script>
+function load{$tableId}() {
+    loadTableData('{$tableId}', '{{ route("ROUTENAME.list") }}', function(item) {
+        const row = document.createElement('tr');
+        row.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-700';
+        row.innerHTML = \`
+            <td class="px-6 py-3">\${item.id}</td>
+            <td class="px-6 py-3">\${item.name}</td>
+            <td class="px-6 py-3">\${item.created_at}</td>
+            <td class="px-6 py-3 text-right">
+                <div class="flex gap-2 justify-end">
+                    <a href="\${item.actions.show}" class="text-blue-600 hover:text-blue-900 text-sm font-medium">{{ __('View') }}</a>
+                    <a href="\${item.actions.edit}" class="text-amber-600 hover:text-amber-900 text-sm font-medium">{{ __('Edit') }}</a>
+                    <button onclick="deleteItem('\${item.actions.delete}')" class="text-red-600 hover:text-red-900 text-sm font-medium">{{ __('Delete') }}</button>
+                </div>
+            </td>
+        \`;
+        return row;
+    });
+}
+</script>
 @endpush
 @endsection
 BLADE;

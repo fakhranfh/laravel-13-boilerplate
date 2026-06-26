@@ -73,9 +73,6 @@ class MakeRepositoryServiceController extends Command
 
             $this->info('');
             $this->info('<fg=green>✓ Generation completed successfully!</>');
-            $this->info('Route names:');
-            $this->info("  - {$label} Index: <comment>".Str::kebab($label).'.index</comment>');
-            $this->info("  - {$label} List (DataTables API): <comment>".Str::kebab($label).'.list</comment>');
 
             return 0;
         } catch (\Exception $e) {

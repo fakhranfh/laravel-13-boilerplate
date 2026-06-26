@@ -117,9 +117,13 @@ class DeleteRepositoryServiceController extends Command
         $content = File::get($routesPath);
         $routeName = Str::kebab($name);
 
-        // Remove routes related to this resource
-        $pattern = "/Route::resource\(['\"]".preg_quote($routeName)."['\"][^)]*\);?\n?/";
+        // Remove API datatable list route
+        $pattern = "/Route::get\(['\"]".preg_quote($routeName)."\\/data\\/list['\"][^)]*\);?\s*\n?/";
         $updated = preg_replace($pattern, '', $content);
+
+        // Remove resource route
+        $pattern = "/Route::resource\(['\"]".preg_quote($routeName)."['\"][^)]*\);?\n?/";
+        $updated = preg_replace($pattern, '', $updated);
 
         // Remove controller import
         $pattern = '/use App\\\\Http\\\\Controllers\\\\'.preg_quote($name)."Controller;?\s*\n?/";
