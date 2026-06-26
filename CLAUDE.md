@@ -128,6 +128,19 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - For interactive generation with column configuration: follow the prompts to define columns, types, and form input types. Use `back` to remove the last column if needed.
 - For complete details, examples, and troubleshooting, see `docs/CRUD_GENERATOR.md`.
 
+### Manual Entity Creation (Without make:rsc)
+
+- If creating an entity **without** the CRUD generator, you **MUST** follow the **Repository Pattern** documented in `docs/REPOSITORY_PATTERN.md`.
+- Required structure:
+  - **Repository Interface**: `app/Repositories/{Model}/{Model}RepositoryInterface.php`
+  - **Repository Implementation**: `app/Repositories/{Model}/{Model}Repository.php`
+  - **Service Layer**: `app/Services/{Model}Service.php`
+  - **Controller**: `app/Http/Controllers/{Model}Controller.php`
+  - **Form Requests**: `app/Http/Requests/{Model}/Store{Model}Request.php`, `Update{Model}Request.php`
+  - **Service Provider Binding**: Register in `app/Providers/AppServiceProvider.php`
+- Follow the method signatures and patterns in `docs/REPOSITORY_PATTERN.md` for consistency with auto-generated code.
+- This ensures code consistency across the entire application and makes it easier for all team members to understand and maintain entities.
+
 ## APIs & Eloquent Resources
 
 - For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.
