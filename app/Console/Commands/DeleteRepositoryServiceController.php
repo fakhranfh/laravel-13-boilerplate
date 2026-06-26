@@ -121,9 +121,13 @@ class DeleteRepositoryServiceController extends Command
         $pattern = "/Route::resource\(['\"]".preg_quote($routeName)."['\"][^)]*\);?\n?/";
         $updated = preg_replace($pattern, '', $content);
 
+        // Remove controller import
+        $pattern = '/use App\\\\Http\\\\Controllers\\\\'.preg_quote($name)."Controller;?\s*\n?/";
+        $updated = preg_replace($pattern, '', $updated);
+
         if ($updated !== $content) {
             File::put($routesPath, $updated);
-            $this->info("✓ Removed routes for '{$routeName}'");
+            $this->info("✓ Removed routes and imports for '{$routeName}'");
         }
     }
 
