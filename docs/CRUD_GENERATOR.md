@@ -1,7 +1,7 @@
 # CRUD Generator - Complete Guide
 
-**Version:** 1.0  
-**Date:** June 24, 2026  
+**Version:** 2.0  
+**Date:** June 26, 2026  
 **Status:** ✅ Production Ready
 
 ---
@@ -10,16 +10,19 @@
 
 1. [Overview](#overview)
 2. [Quick Start](#quick-start)
-3. [Command Reference](#command-reference)
-4. [Generated Files](#generated-files)
-5. [Routes Setup](#routes-setup)
-6. [View Details](#view-details)
-7. [Field Types](#field-types)
-8. [Testing with Dusk](#testing-with-dusk)
-9. [Tailwind CSS](#tailwind-css)
-10. [Customization](#customization)
-11. [Architecture](#architecture)
-12. [Troubleshooting](#troubleshooting)
+3. [Create Command (make:rsc)](#create-command-makersc)
+4. [Delete Command (delete:rsc)](#delete-command-deletersc)
+5. [Migration Setup](#migration-setup)
+6. [Column Configuration](#column-configuration)
+7. [Generated Files](#generated-files)
+8. [Routes Setup](#routes-setup)
+9. [View Details](#view-details)
+10. [Field Types](#field-types)
+11. [Testing with Dusk](#testing-with-dusk)
+12. [Tailwind CSS](#tailwind-css)
+13. [Customization](#customization)
+14. [Architecture](#architecture)
+15. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -45,40 +48,56 @@ php artisan make:rsc Product --label="Products"
 
 ---
 
----
-
 ## Quick Start
 
-### 1. Create Model with Migration
+### Generate CRUD with Interactive Migration
 ```bash
-php artisan make:model Product -m
+php artisan make:rsc Product --label="Products"
 ```
 
-### 2. Define Migration Fields
+**The generator will:**
+1. ✅ Ask if you want to create a migration
+2. ✅ Interactively prompt for column details
+3. ✅ Create migration automatically
+4. ✅ Ask to run migration
+5. ✅ Generate Repository, Service, and Controller
+6. ✅ Generate Form Requests
+7. ✅ Configure form input types
+8. ✅ Generate Blade views
+9. ✅ Create routes in `routes/web.php`
+
+### Manual Setup (If Needed)
+
+**1. Create Model only:**
+```bash
+php artisan make:model Product
+```
+
+**2. Define migration fields manually:**
 ```php
 // database/migrations/xxxx_create_products_table.php
 Schema::create('products', function (Blueprint $table) {
     $table->id();
     $table->string('name');
     $table->text('description')->nullable();
-    $table->decimal('price', 10, 2)->nullable();
+    $table->decimal('price', 10, 2);
     $table->integer('stock')->default(0);
     $table->boolean('is_active')->default(true);
     $table->timestamps();
 });
 ```
 
-### 3. Run Migration
+**3. Run migration:**
 ```bash
 php artisan migrate
 ```
 
-### 4. Generate CRUD
+**4. Generate CRUD:**
 ```bash
-php artisan make:rsc Product --label="Products"
+php artisan make:rsc Product --label="Products" --repository-service-only
 ```
 
-### 5. Add Routes to `routes/web.php`
+**5. Add routes to `routes/web.php`:**
 ```php
 use App\Http\Controllers\ProductController;
 
@@ -87,41 +106,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 ```
 
-### 6. Test
+**6. Test:**
 ```bash
 php artisan dusk
-# Screenshots: tests/Browser/screenshots/
 ```
 
 ---
 
-## Command Reference
+## Create Command (make:rsc)
 
 ### Basic Syntax
 ```bash
-php artisan make:rsc {ModelName} [--label="Label"] [--view-path=path]
-```
-
-### Examples
-
-**Default (views in `app` folder):**
-```bash
-php artisan make:rsc Product --label="Products"
-# → resources/views/app/product/
-```
-
-**Custom view path:**
-```bash
-php artisan make:rsc Product --label="Products" --view-path="admin"
-# → resources/views/admin/product/
-
-php artisan make:rsc Product --label="Products" --view-path="dashboard"
-# → resources/views/dashboard/product/
-```
-
-**Repository & Service Only (skip controller/views):**
-```bash
-php artisan make:rsc Product --repository-service-only
+php artisan make:rsc {ModelName} [--label="Label"] [--view-path=path] [--repository-service-only]
 ```
 
 ### Options
@@ -133,6 +129,229 @@ php artisan make:rsc Product --repository-service-only
 | `--view-path` | `app` | View directory path |
 | `--repository-service-only` | false | Skip controller & views |
 
+### Examples
+
+**Full CRUD with interactive migration:**
+```bash
+php artisan make:rsc Product --label="Products"
+# Creates: Model, Migration, Repository, Service, Controller, Views, Routes
+```
+
+**Custom view path:**
+```bash
+php artisan make:rsc Product --label="Products" --view-path="admin"
+# → resources/views/admin/product/
+```
+
+**Repository & Service Only:**
+```bash
+php artisan make:rsc Product --repository-service-only
+# Skips: Controller and Views
+# Useful for API-only models
+```
+
+### Interactive Flow
+
+When you run the command, it will prompt you:
+
+```
+Do you want to create a migration? [yes]
+  → Type "yes" or press Enter to create migration
+
+Column name (or "done" to finish, "back" to remove last column):
+  → name                          ← column name
+  Column type [text]:
+    [1] string
+    [2] integer
+    [3] decimal
+    [4] boolean
+    [5] date
+    ...
+  String length (press Enter for default 255): 255
+  Nullable? [no]: no
+  Add default value? [no]: no
+  Add index? [no]: no
+  Add unique constraint? [no]: no
+
+  Input type for 'name' field:
+    [1] skip
+    [2] text
+    [3] email
+    [4] password
+    [5] url
+    [6] tel
+    
+  Confirm column configuration? [yes]
+```
+
+#### Column Configuration Details
+
+- **Column name:** Database column name (snake_case recommended)
+- **Column type:** Choose from: string, integer, decimal, boolean, text, date, datetime, timestamp, json, enum
+- **Type-specific options:**
+  - **string:** Length (default 255)
+  - **decimal:** Precision and scale (e.g., 10,2)
+  - **enum:** Comma-separated values
+- **Nullable:** Can column be null?
+- **Default value:** Default value for new records
+- **Index:** Add database index for faster queries
+- **Unique:** Add unique constraint (string only)
+- **Input type:** Form field type for generated views
+  - `skip` = Don't include in forms
+  - `text` = Regular text input
+  - `email` = Email input
+  - `password` = Password input
+  - `url` = URL input
+  - `tel` = Telephone input
+  - `textarea` = Multi-line text
+  - `select` = Dropdown (for enums)
+  - `radio` = Radio buttons (for boolean)
+  - `checkbox` = Checkbox input
+  - `date` = Date picker
+  - `datetime-local` = DateTime picker
+  - `number` = Number input
+
+#### Tips
+
+- Type `back` to remove the last column and reconfigure it
+- Type `done` when you've added all columns
+- The command will verify your configuration before creating the migration
+- If migration runs successfully, you'll be prompted to configure form input types
+
+---
+
+## Delete Command (delete:rsc)
+
+### Basic Syntax
+```bash
+php artisan delete:rsc {ModelName} [--migrations]
+```
+
+### Options
+
+| Option | Default | Purpose |
+|--------|---------|---------|
+| `name` | Required | Model/resource name to delete |
+| `--migrations` | false | Also delete migration files |
+
+### Examples
+
+**Delete all CRUD files:**
+```bash
+php artisan delete:rsc Product
+# Deletes: Model, Repository, Service, Controller, Form Requests, Views
+# Removes: Routes, Service Provider Binding, Sidebar Item
+```
+
+**Delete with migrations:**
+```bash
+php artisan delete:rsc Product --migrations
+# Also deletes: Migration files matching the table name
+```
+
+### What Gets Deleted
+
+**Files:**
+- ✓ Model: `app/Models/Product.php`
+- ✓ Repository: `app/Repositories/Product/`
+- ✓ Service: `app/Services/ProductService.php`
+- ✓ Controller: `app/Http/Controllers/ProductController.php`
+- ✓ Form Requests: `app/Http/Requests/Product/`
+- ✓ Views: `resources/views/app/product/` (or custom path)
+- ✓ Migrations (if `--migrations` flag used)
+
+**Configuration:**
+- ✓ Routes: Removes `Route::resource('product', ...)` from `routes/web.php`
+- ✓ Service Provider: Removes binding from `app/Providers/AppServiceProvider.php`
+- ✓ Sidebar: Removes menu item from `resources/views/components/sidebar.blade.php`
+
+### Safety Features
+
+- ✓ Confirmation prompt before deletion
+- ✓ Detailed output showing what was deleted
+- ✓ Safe pattern matching (won't delete unrelated files)
+- ✓ Graceful handling if files don't exist
+
+---
+
+## Migration Setup
+
+The `make:rsc` command handles migration creation interactively. Here's what happens:
+
+---
+
+## Column Configuration
+
+### Column Type Reference
+
+| Type | Options | Use Case |
+|------|---------|----------|
+| `string` | Length (default 255) | Names, titles, short text |
+| `integer` | None | Whole numbers, quantities |
+| `bigInteger` | None | Large whole numbers |
+| `smallInteger` | None | Small whole numbers |
+| `decimal` | Precision, Scale | Prices, ratings, precise decimals |
+| `float` | None | Floating point numbers |
+| `boolean` | None | True/False, Yes/No, Active/Inactive |
+| `text` | None | Long text, descriptions, content |
+| `longText` | None | Very long content |
+| `date` | None | Date only (YYYY-MM-DD) |
+| `dateTime` | None | Date and time |
+| `timestamp` | None | Auto-timestamp fields |
+| `json` | None | JSON data |
+| `enum` | Comma-separated values | Fixed set of options |
+
+### Form Input Type Mapping
+
+The generator automatically suggests input types based on column type:
+
+| Column Type | Suggested Input Types |
+|-------------|----------------------|
+| `string` | text, email, password, url, tel |
+| `integer` | number |
+| `decimal` / `float` | number |
+| `boolean` | radio, checkbox |
+| `text` / `longText` | textarea |
+| `date` | date |
+| `dateTime` / `timestamp` | datetime-local |
+| `enum` | select |
+| `json` | textarea |
+
+### Example: Creating a Product Table
+
+```
+Column 1: name
+  Type: string
+  Length: 255
+  Nullable: no
+  Default: none
+  Index: no
+  Unique: yes
+  Input Type: text
+
+Column 2: description
+  Type: text
+  Nullable: yes
+  Default: none
+  Input Type: textarea
+
+Column 3: price
+  Type: decimal
+  Precision: 10
+  Scale: 2
+  Nullable: no
+  Index: yes
+  Input Type: number
+
+Column 4: is_active
+  Type: boolean
+  Nullable: no
+  Default: true
+  Input Type: radio
+
+Type "done" to finish migration creation
+```
+
 ---
 
 ## Generated Files
@@ -141,50 +360,81 @@ php artisan make:rsc Product --repository-service-only
 
 ```
 app/
+├── Models/Product.php                           # Eloquent Model
 ├── Repositories/Product/
-│   ├── ProductRepositoryInterface.php
-│   └── ProductRepository.php
-├── Services/ProductService.php
-├── Http/Controllers/ProductController.php
+│   ├── ProductRepositoryInterface.php           # Interface
+│   └── ProductRepository.php                    # Implementation
+├── Services/ProductService.php                  # Business Logic
+├── Http/Controllers/ProductController.php       # HTTP Handler
 └── Http/Requests/Product/
-    ├── StoreProductRequest.php
-    └── UpdateProductRequest.php
+    ├── StoreProductRequest.php                  # Create Validation
+    └── UpdateProductRequest.php                 # Update Validation
+
+database/migrations/
+└── xxxx_create_products_table.php               # Migration
 
 resources/views/app/product/
-├── index.blade.php      # List page
-├── create.blade.php     # Create form
-├── edit.blade.php       # Edit form + sidebar
-└── show.blade.php       # View details
+├── index.blade.php                              # List page
+├── create.blade.php                             # Create form
+├── edit.blade.php                               # Edit form + sidebar
+└── show.blade.php                               # View details
 
-tests/Browser/ProductCrudTest.php
-routes/web.php           # Add routes here manually
+routes/web.php                                   # Auto-added routes
+app/Providers/AppServiceProvider.php             # Auto-added binding
+
+resources/views/components/sidebar.blade.php     # Auto-added menu item
 ```
 
 ### Output Messages
 
+**Migration Phase:**
 ```
-✅ Repository Interface created
-✅ Repository created
-✅ Service created
-✅ Controller created
-✅ Form Request rules generated
-✅ Blade index view created
-✅ Blade create view created
-✅ Blade edit view created
-✅ Blade show view created
-⚠️ Could not find Route::middleware pattern (add manually)
+✓ Column 'name' added
+✓ Column 'description' added
+✓ Column 'price' added
+Migration executed successfully.
+```
+
+**CRUD Generation Phase:**
+```
+✓ Model created
+✓ Repository Interface created
+✓ Repository created
+✓ Service created
+✓ Service provider binding added
+✓ Controller created
+✓ Form Request rules generated
+✓ Blade index view created
+✓ Blade create view created
+✓ Blade edit view created
+✓ Blade show view created
+✓ Routes added
+✓ Sidebar item added
+```
+
+**Final:**
+```
+php artisan optimize executed.
+```
+
+**Error Handling:**
+```
+Error occurred: [error message]
+Cleaning up generated files...
+[Deleted: Model, Repository, Service, Controller, etc.]
+Generation failed and files have been cleaned up.
 ```
 
 ---
 
 ## Routes Setup
 
-### ⚠️ Manual Route Addition Required
+### ✅ Automatic Route Generation
 
-Generator cannot auto-detect middleware pattern in all cases. Add routes manually:
+The generator automatically adds routes to `routes/web.php`:
 
 ```php
-// routes/web.php
+// routes/web.php - Auto-added by generator
 use App\Http\Controllers\ProductController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -192,7 +442,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 ```
 
-### RESTful Routes Generated
+**If routes don't auto-add**, add them manually and ensure:
+- Correct controller namespace
+- Proper middleware applied
+- Kebab-cased route name matches view path
+
+### RESTful Routes Created
 
 | HTTP | URL | Action | Route Name |
 |------|-----|--------|-----------|
@@ -408,79 +663,6 @@ Generator auto-detects database column types and creates appropriate form inputs
   <input type="radio" name="is_active" value="0">
   <label>No</label>
 </div>
-```
-
----
-
-## Testing with Dusk
-
-### Test File
-
-**Location:** `tests/Browser/ProductCrudTest.php`
-
-**Test Cases (11):**
-```
-1. test_product_index_page_loads
-2. test_create_product_page_loads
-3. test_create_new_product
-4. test_edit_product
-5. test_view_product_details
-6. test_delete_product
-7. test_product_validation_errors
-8. test_product_list_with_multiple_products
-```
-
-### Running Tests
-
-**Run all Dusk tests:**
-```bash
-php artisan dusk
-```
-
-**Run specific test file:**
-```bash
-php artisan dusk tests/Browser/ProductCrudTest.php
-```
-
-**Run with visible browser (debug):**
-```bash
-php artisan dusk --debug
-```
-
-**Run without headless (see browser window):**
-```bash
-DUSK_HEADLESS_DISABLED=true php artisan dusk
-```
-
-### Screenshots Generated
-
-Tests auto-generate screenshots to `tests/Browser/screenshots/`:
-
-```
-01-products-index.png                    # List page
-02-product-create-page.png              # Create form
-03-product-created-success.png          # Success message after create
-04-product-show-page.png                # Product details
-05-product-edit-page.png                # Edit form
-06-product-edit-success.png             # Success message after edit
-07-product-show-detailed.png            # Full details view
-08-delete-modal-opened.png              # Delete confirmation
-09-product-deleted-success.png          # Success message after delete
-10-product-validation-errors.png        # Validation errors
-11-product-list-multiple.png            # List with multiple items
-```
-
-### View Screenshots
-
-```bash
-# On macOS
-open tests/Browser/screenshots/
-
-# On Windows
-start tests/Browser/screenshots/
-
-# On Linux
-xdg-open tests/Browser/screenshots/
 ```
 
 ---
@@ -712,20 +894,129 @@ ProductRepository::update()
 
 ---
 
+## Sidebar Management
+
+The generator automatically adds menu items to `resources/views/components/sidebar.blade.php`:
+
+```blade
+<!-- product -->
+<li>
+    <a href="{{ route('products.index') }}" class="...">
+        Products
+    </a>
+</li>
+```
+
+### Remove Sidebar Item
+
+When you delete a CRUD with `php artisan delete:rsc Product`, the sidebar item is automatically removed.
+
+**Manual removal:**
+```blade
+<!-- product -->
+<li>
+    <a href="{{ route('products.index') }}" class="...">
+        Products
+    </a>
+</li>
+<!-- Remove the entire comment and <li> block -->
+```
+
+---
+
+## Service Provider Binding
+
+The generator automatically adds bindings to `app/Providers/AppServiceProvider.php`:
+
+```php
+$this->app->bind(
+    ProductRepositoryInterface::class,
+    ProductRepository::class
+);
+```
+
+When you delete with `php artisan delete:rsc Product`, bindings are automatically removed.
+
+---
+
 ## Troubleshooting
+
+### Issue: Migration errors during column creation
+
+**Problem:** Invalid column type or configuration  
+**Solution:**
+1. Use `back` command to remove the problematic column
+2. Check column type is valid (string, integer, decimal, etc.)
+3. For decimal, ensure precision > scale
+4. Re-add the column with correct settings
+
+```
+Column name: price
+Column type: decimal
+Precision (total digits) [8]: 10
+Scale (decimal places) [2]: 2  ← Must be ≤ 10
+```
+
+### Issue: Input type not matching column type
+
+**Problem:** Form field type doesn't match database type  
+**Solution:**
+1. The generator suggests appropriate input types automatically
+2. If wrong type was selected, manually edit the blade file
+3. Or delete and regenerate with correct input type
+
+```bash
+# Delete and regenerate
+php artisan delete:rsc Product
+php artisan make:rsc Product --label="Products"
+```
 
 ### Issue: Views not rendering
 
 **Problem:** Blade files not found  
 **Solution:**
-1. Verify view path in controller matches actual location
-2. Check blade files exist in `resources/views/`
-3. Ensure path matches model name (kebab-case)
+1. Verify view path matches `--view-path` option
+2. Check files exist in `resources/views/app/` (default) or custom path
+3. Ensure model name matches view folder (kebab-case)
 
 ```bash
 # Check actual paths
-ls -la resources/views/app/product/
-ls -la resources/views/admin/product/
+ls resources/views/app/product/
+ls resources/views/admin/product/  # if --view-path=admin used
+```
+
+### Issue: Generation failed and files were cleaned up
+
+**Problem:** Error occurred during generation, all files automatically deleted  
+**Solution:**
+1. Check the error message for details
+2. Common causes:
+   - Invalid migration (duplicate column, syntax error)
+   - Disk permissions issue
+   - Database connection problem
+3. Fix the issue and run `make:rsc` again
+
+```bash
+# If migration was the issue, retry from scratch
+php artisan make:rsc Product --label="Products"
+```
+
+### Issue: Deletion didn't remove everything
+
+**Problem:** Some files/config still exist after delete:rsc  
+**Solution:**
+1. Delete command removes what it can find
+2. If you manually edited files, delete them manually:
+   - Custom blade files
+   - Modified routes
+   - Custom repository methods
+3. Check sidebar for orphaned menu items
+
+```bash
+# Verify what was deleted
+git status  # See what files changed
+grep -r "Product" routes/web.php  # Check if routes removed
+grep -r "ProductRepository" app/Providers/AppServiceProvider.php
 ```
 
 ### Issue: Form validation errors not showing
@@ -735,6 +1026,7 @@ ls -la resources/views/admin/product/
 1. Verify Form Request class exists
 2. Check validation rules are defined
 3. Ensure error messages in blade template
+4. Check form has `method="POST"` with CSRF token
 
 ```php
 // app/Http/Requests/Product/StoreProductRequest.php
@@ -747,30 +1039,42 @@ public function rules(): array
 }
 ```
 
+```blade
+<!-- In create/edit view -->
+@if ($errors->any())
+    @foreach ($errors->all() as $error)
+        <div class="text-red-600">{{ $error }}</div>
+    @endforeach
+@endif
+```
+
 ### Issue: Styles not applying
 
 **Problem:** Tailwind classes not working  
 **Solution:**
-1. Run build: `npm run build`
-2. Check no CSS conflicts
-3. Verify dark mode meta tag in layout
-4. Clear browser cache
+1. Rebuild CSS: `npm run build`
+2. Or run dev watcher: `npm run dev`
+3. Check no CSS conflicts
+4. Verify dark mode meta tag in layout
+5. Clear browser cache
 
 ```bash
+# Build once
 npm run build
-php artisan optimize:clear
+
+# OR watch for changes
+npm run dev
 ```
 
-### Issue: Routes not working
+### Issue: Routes not automatically added
 
-**Problem:** 404 errors on CRUD pages  
+**Problem:** Routes missing from `routes/web.php`  
 **Solution:**
-1. Verify routes added to `routes/web.php`
-2. Check controller import
-3. Ensure middleware correct
+1. Generator tries to add routes automatically
+2. If it fails, add manually:
 
 ```php
-// routes/web.php - Add this:
+// routes/web.php
 use App\Http\Controllers\ProductController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -778,22 +1082,73 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 ```
 
-Verify:
+**Verify routes exist:**
 ```bash
-php artisan route:list | grep products
+php artisan route:list | grep product
 ```
 
-### Issue: Dark mode not working
+### Issue: Service provider binding not added
 
-**Problem:** Dark classes ignored  
+**Problem:** Dependency injection fails  
 **Solution:**
-1. Check layout extends proper base
-2. Verify Tailwind config has dark mode
-3. Test in browser dev tools
+1. Generator automatically adds binding
+2. If missing, add manually to `AppServiceProvider.php`:
 
-```html
-<!-- In resources/views/layouts/app.blade.php -->
-<html class="dark">  <!-- Add class for testing -->
+```php
+public function register(): void
+{
+    $this->app->bind(
+        \App\Repositories\Product\ProductRepositoryInterface::class,
+        \App\Repositories\Product\ProductRepository::class
+    );
+}
+```
+
+### Issue: Sidebar item not showing
+
+**Problem:** Menu item missing from sidebar  
+**Solution:**
+1. Check `resources/views/components/sidebar.blade.php`
+2. Generator tries to add it automatically
+3. If missing, add manually:
+
+```blade
+<!-- product -->
+<li>
+    <a href="{{ route('products.index') }}" class="px-4 py-2 hover:bg-gray-100">
+        Products
+    </a>
+</li>
+```
+
+### Issue: Database table already exists
+
+**Problem:** Migration fails because table exists  
+**Solution:**
+1. Generator prompts to drop existing table
+2. Choose yes to recreate
+3. Or drop manually:
+
+```bash
+php artisan migrate:refresh  # Drop all tables
+php artisan migrate           # Re-run all migrations
+```
+
+### Issue: Column already exists in table
+
+**Problem:** Can't add column to existing table  
+**Solution:**
+1. Use `--repository-service-only` to skip migration
+2. Or manually create a new migration:
+
+```bash
+php artisan make:migration add_columns_to_products_table
+```
+
+```php
+Schema::table('products', function (Blueprint $table) {
+    $table->string('new_column')->nullable();
+});
 ```
 
 ---
@@ -802,15 +1157,16 @@ php artisan route:list | grep products
 
 | Metric | Count |
 |--------|-------|
-| New stub generators | 4 |
-| Modified files | 5 |
-| Documentation pages | 1 |
+| Console Commands | 2 (make:rsc, delete:rsc) |
+| Generator Classes | 7+ |
 | Blade files per CRUD | 4 |
-| Dusk test cases | 11 |
-| Auto-generated screenshots | 11 |
-| Supported field types | 8 |
+| Supported column types | 13 |
+| Input type options | 10+ |
+| Generated files per CRUD | 8 |
+| Dusk test cases | 11+ |
+| Auto-generated screenshots | 11+ |
 | Tailwind utilities used | 50+ |
-| Total documentation | 2000+ lines |
+| Configuration prompts | 10+ |
 
 ---
 
@@ -835,9 +1191,156 @@ Before deploying to production:
 
 ---
 
+## Best Practices
+
+### 1. Plan Your Schema First
+```
+Take time to plan your columns before running make:rsc:
+- Write down all columns you need
+- Decide on types and constraints
+- Plan relationships with other tables
+- Consider indexing strategy
+```
+
+### 2. Use Descriptive Names
+```bash
+# Good: Clear, descriptive names
+php artisan make:rsc BlogArticle --label="Blog Articles"
+
+# Avoid: Vague names
+php artisan make:rsc Item --label="Items"
+```
+
+### 3. Leverage the "back" Feature
+```
+While adding columns, if you make a mistake:
+- Type "back" to remove the last column
+- Re-add it with correct settings
+- Much faster than deleting and regenerating everything
+```
+
+### 4. Use --repository-service-only Wisely
+```bash
+# Use this when:
+php artisan make:rsc Product --repository-service-only
+
+# For API-only resources without views
+# For sharing repository logic across multiple controllers
+# When you'll create custom controllers
+```
+
+### 5. Customize After Generation
+```
+The generator creates excellent starting points:
+1. Generate the full CRUD
+2. Test that it works
+3. Customize views/validation as needed
+4. Don't re-generate if you made small changes
+```
+
+### 6. Version Control
+```bash
+# Commit after successful generation
+git add .
+git commit -m "feat: create product CRUD"
+
+# This way, if something needs fixing, you can revert
+git revert HEAD
+```
+
+### 7. Verify Before Deleting
+```bash
+# Always check what you're about to delete
+git status
+
+# The delete command is careful, but verify routes/config removal
+grep -r "Product" routes/web.php
+grep -r "ProductRepository" app/Providers/
+```
+
+---
+
+## Error Recovery
+
+### If Generation Fails
+
+**The generator has built-in rollback:**
+1. All generated files are tracked
+2. If ANY error occurs, it automatically cleans up
+3. Database rolls back if migration fails
+4. No orphaned files left behind
+
+```
+Error occurred: [details]
+Cleaning up generated files...
+Deleted: Model
+Deleted: Repository  
+Deleted: Service
+Deleted: Controller
+...
+Generation failed and files have been cleaned up.
+```
+
+### Manual Recovery
+
+If you need to fix something:
+
+```bash
+# Check what files exist
+git status
+
+# View the error in detail
+php artisan make:rsc Product --label="Products" 2>&1
+
+# Delete manually if needed
+php artisan delete:rsc Product
+
+# Re-run with correct options
+php artisan make:rsc Product --label="Products"
+```
+
+### Database Recovery
+
+If migration failed:
+
+```bash
+# Check table status
+php artisan tinker
+> Schema::getTables()
+
+# Rollback last migration
+php artisan migrate:rollback
+
+# Or reset everything
+php artisan migrate:fresh  # ⚠️ Deletes all data
+```
+
+---
+
 ## Files Reference
 
-### Stub Generators
+### Main Commands
+```
+app/Console/Commands/
+├── MakeRepositoryServiceController.php      # Generate CRUD
+└── DeleteRepositoryServiceController.php    # Delete CRUD
+```
+
+### Generators
+```
+app/Console/Commands/Generators/
+├── MigrationGenerator.php
+├── ModelGenerator.php
+├── RepositoryGenerator.php
+├── ServiceGenerator.php
+├── ControllerGenerator.php
+├── FormRequestGenerator.php
+├── BladeGenerator.php
+├── RouteGenerator.php
+└── ServiceProviderBindingGenerator.php
+```
+
+### Blade Stubs
 ```
 app/Console/Commands/Stubs/
 ├── TailwindBladeIndexStubGenerator.php
@@ -846,18 +1349,11 @@ app/Console/Commands/Stubs/
 └── TailwindBladeShowStubGenerator.php
 ```
 
-### Logic Generators
-```
-app/Console/Commands/Generators/
-├── BladeGenerator.php
-├── ControllerGenerator.php
-└── RouteGenerator.php
-```
-
 ### Tests
 ```
-tests/Browser/ProductCrudTest.php
-tests/Browser/screenshots/
+tests/Browser/
+├── ProductCrudTest.php  (example)
+└── screenshots/         (auto-generated)
 ```
 
 ---
@@ -873,17 +1369,42 @@ tests/Browser/screenshots/
 
 ## Summary
 
-**Tailwind CRUD Generator v1.0** creates professional CRUD applications with:
-- Modern Tailwind CSS styling
-- Responsive design
-- Dark mode support
-- Comprehensive testing
-- Auto-generated screenshots
-- Configurable view paths
-- Complete documentation
+**Tailwind CRUD Generator v2.0** creates professional CRUD applications with:
+
+**Generation Features:**
+- ✅ Interactive migration creation with column configuration
+- ✅ Automatic column verification
+- ✅ Smart input type selection
+- ✅ Repository + Service + Controller generation
+- ✅ Form Request auto-generation
+- ✅ Blade view creation (index, create, edit, show)
+- ✅ Automatic route registration
+- ✅ Service Provider binding
+- ✅ Sidebar menu integration
+
+**Cleanup Features:**
+- ✅ Complete file deletion
+- ✅ Route removal
+- ✅ Service Provider binding removal
+- ✅ Sidebar item removal
+- ✅ Optional migration cleanup
+
+**Design:**
+- ✅ Modern Tailwind CSS v4 styling
+- ✅ Responsive mobile-first design
+- ✅ Dark mode support
+- ✅ Configurable view paths
+- ✅ RESTful routing
+
+**Testing & Documentation:**
+- ✅ Dusk browser tests
+- ✅ Auto-generated screenshots
+- ✅ Comprehensive documentation
+- ✅ Error handling with automatic cleanup
 
 **Status:** ✅ Production Ready  
-**Last Updated:** June 24, 2026  
+**Last Updated:** June 26, 2026  
+**Version:** 2.0  
 **Maintainer:** Laravel Boost Team
 
 ---
