@@ -57,6 +57,24 @@ class {$name}Controller extends Controller
         return view('{$viewPath}.{$kebabCaseName}.index');
     }
 
+    public function list(Request \$request)
+    {
+        \$items = \$this->{$camelCaseName}Service->getAll();
+
+        return response()->json([
+            'data' => \$items->map(fn(\$item) => [
+                'id' => \$item->id,
+                'name' => \$item->name ?? '',
+                'created_at' => \$item->created_at?->format('Y-m-d H:i:s') ?? '',
+                'actions' => [
+                    'show' => route('{$labelKebab}.show', \$item->id),
+                    'edit' => route('{$labelKebab}.edit', \$item->id),
+                    'delete' => route('{$labelKebab}.destroy', \$item->id),
+                ]
+            ])->toArray()
+        ]);
+    }
+
     public function show(\$id)
     {
         \$item = \$this->{$camelCaseName}Service->find(\$id);

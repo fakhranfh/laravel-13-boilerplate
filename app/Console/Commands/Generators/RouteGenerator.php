@@ -11,7 +11,7 @@ class RouteGenerator
 
     public function __construct()
     {
-        $this->filesystem = new Filesystem();
+        $this->filesystem = new Filesystem;
     }
 
     public function generate(string $name, string $label, callable $callback): void
@@ -62,6 +62,7 @@ class RouteGenerator
         $routeStub = <<<PHP
 
         Route::resource('{$routeName}', {$name}Controller::class);
+        Route::get('{$routeName}/data/list', [{$name}Controller::class, 'list'])->name('{$routeName}.list');
 
     PHP;
 
@@ -73,12 +74,13 @@ class RouteGenerator
             if (strpos($middlewareArray, 'auth') !== false) {
                 if (strpos($groupBody, "[App\Http\Controllers\\{$name}Controller::class") === false && strpos($groupBody, "{$name}Controller") === false) {
                     $insertPos = $matches[2][1] + strlen($groupBody);
-                    $newContent = substr($webRouteContent, 0, $insertPos) . $routeStub . substr($webRouteContent, $insertPos);
+                    $newContent = substr($webRouteContent, 0, $insertPos).$routeStub.substr($webRouteContent, $insertPos);
                     $this->filesystem->put($webRoutePath, $newContent);
                     $callback("Resource route for {$name} appended to routes/web.php.", 'info');
                 } else {
                     $callback("Route for {$name} already exists in routes/web.php. Skipping append.", 'warn');
                 }
+
                 return;
             }
         }
@@ -89,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('{$routeName}', {$name}Controller::class);
 });
 PHP;
-        $newContent = $webRouteContent . "\n" . $middlewareGroup;
+        $newContent = $webRouteContent."\n".$middlewareGroup;
         $this->filesystem->put($webRoutePath, $newContent);
         $callback("Route::middleware(['auth'])->group() not found. Created new middleware group with {$name} resource route.", 'info');
     }

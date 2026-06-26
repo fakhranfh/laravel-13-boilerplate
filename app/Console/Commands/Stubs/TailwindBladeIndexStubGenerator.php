@@ -64,7 +64,7 @@ class TailwindBladeIndexStubGenerator
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-sm text-gray-700 dark:text-gray-300" id="ROUTENAME-table">
+                <table class="w-full text-sm text-gray-700 dark:text-gray-300 display" id="ROUTENAME-table">
                     <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
                             <th class="px-6 py-3 text-left font-semibold">{{ __('ID') }}</th>
@@ -77,47 +77,74 @@ class TailwindBladeIndexStubGenerator
                     </tbody>
                 </table>
             </div>
-
-            <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                <nav class="flex justify-center" aria-label="Pagination">
-                    <ul class="inline-flex -space-x-px">
-                        <li>
-                            <a href="#" class="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                                {{ __('Previous') }}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                                1
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="px-3 py-2 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">
-                                2
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                                {{ __('Next') }}
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
         </div>
     </div>
 </div>
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+@endpush
+
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const table = document.getElementById('ROUTENAME-table');
-        if (table) {
-            console.log('Table initialized for ROUTENAME');
-        }
-    });
-</script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('ROUTENAME-table');
+            if (table) {
+                const dataTable = new DataTable('#ROUTENAME-table', {
+                    ajax: {
+                        url: '{{ route("ROUTENAME.list") }}',
+                        type: 'GET',
+                        dataSrc: 'data'
+                    },
+                    columns: [
+                        { data: 'id', title: '{{ __("ID") }}' },
+                        { data: 'name', title: '{{ __("Name") }}' },
+                        { data: 'created_at', title: '{{ __("Created") }}' },
+                        {
+                            data: 'actions',
+                            title: '{{ __("Actions") }}',
+                            orderable: false,
+                            searchable: false,
+                            render: function(data) {
+                                if (!data) return '';
+                                return `
+                                    <div class="flex gap-2 justify-end">
+                                        <a href="${data.show}" class="text-blue-600 hover:text-blue-900 text-sm font-medium">{{ __('View') }}</a>
+                                        <a href="${data.edit}" class="text-amber-600 hover:text-amber-900 text-sm font-medium">{{ __('Edit') }}</a>
+                                        <button onclick="deleteItem('${data.delete}')" class="text-red-600 hover:text-red-900 text-sm font-medium">{{ __('Delete') }}</button>
+                                    </div>
+                                `;
+                            }
+                        }
+                    ],
+                    order: [[0, 'desc']],
+                    pageLength: 10,
+                    processing: true,
+                    serverSide: false
+                });
+            }
+
+            window.deleteItem = function(url) {
+                if (!confirm('{{ __("Are you sure?") }}')) return;
+
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('{{ __("Failed to delete item") }}');
+                });
+            };
+        });
+    </script>
 @endpush
 @endsection
 BLADE;
