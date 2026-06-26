@@ -30,7 +30,7 @@ class BladeGenerator
         $this->showStubGenerator = new TailwindBladeShowStubGenerator;
     }
 
-    public function generate(string $name, string $label, string $viewPath, callable $callback): void
+    public function generate(string $name, string $label, string $viewPath = 'app', array $columnInputTypes = [], ?callable $callback = null): void
     {
         $kebabCaseName = Str::kebab($name);
         $bladeDir = resource_path("views/{$viewPath}/{$kebabCaseName}");
@@ -48,31 +48,43 @@ class BladeGenerator
 
         if (! $this->filesystem->exists($indexBladePath)) {
             $this->filesystem->put($indexBladePath, $indexContent);
-            $callback("Blade index view created: {$indexBladePath}", 'info');
+            if (is_callable($callback)) {
+                $callback("Blade index view created: {$indexBladePath}", 'info');
+            }
         } else {
-            $callback("Blade index view already exists: {$indexBladePath}", 'warn');
+            if (is_callable($callback)) {
+                $callback("Blade index view already exists: {$indexBladePath}", 'warn');
+            }
         }
 
         // Generate Create Blade
-        $createContent = $this->createStubGenerator->generate($name, $label);
+        $createContent = $this->createStubGenerator->generate($name, $label, $columnInputTypes);
         $createContent = str_replace(['LABEL', 'ROUTENAME'], [$label, Str::kebab($name)], $createContent);
 
         if (! $this->filesystem->exists($createBladePath)) {
             $this->filesystem->put($createBladePath, $createContent);
-            $callback("Blade create view created: {$createBladePath}", 'info');
+            if (is_callable($callback)) {
+                $callback("Blade create view created: {$createBladePath}", 'info');
+            }
         } else {
-            $callback("Blade create view already exists: {$createBladePath}", 'warn');
+            if (is_callable($callback)) {
+                $callback("Blade create view already exists: {$createBladePath}", 'warn');
+            }
         }
 
         // Generate Edit Blade
-        $editContent = $this->editStubGenerator->generate($name, $label);
+        $editContent = $this->editStubGenerator->generate($name, $label, $columnInputTypes);
         $editContent = str_replace(['LABEL', 'ROUTENAME'], [$label, Str::kebab($name)], $editContent);
 
         if (! $this->filesystem->exists($editBladePath)) {
             $this->filesystem->put($editBladePath, $editContent);
-            $callback("Blade edit view created: {$editBladePath}", 'info');
+            if (is_callable($callback)) {
+                $callback("Blade edit view created: {$editBladePath}", 'info');
+            }
         } else {
-            $callback("Blade edit view already exists: {$editBladePath}", 'warn');
+            if (is_callable($callback)) {
+                $callback("Blade edit view already exists: {$editBladePath}", 'warn');
+            }
         }
 
         // Generate Show Blade
@@ -81,13 +93,19 @@ class BladeGenerator
 
         if (! $this->filesystem->exists($showBladePath)) {
             $this->filesystem->put($showBladePath, $showContent);
-            $callback("Blade show view created: {$showBladePath}", 'info');
+            if (is_callable($callback)) {
+                $callback("Blade show view created: {$showBladePath}", 'info');
+            }
         } else {
-            $callback("Blade show view already exists: {$showBladePath}", 'warn');
+            if (is_callable($callback)) {
+                $callback("Blade show view already exists: {$showBladePath}", 'warn');
+            }
         }
 
         // Add sidebar button
-        $this->addSidebarItem($kebabCaseName, $label, $callback);
+        if (is_callable($callback)) {
+            $this->addSidebarItem($kebabCaseName, $label, $callback);
+        }
     }
 
     private function addSidebarItem(string $routeName, string $label, callable $callback): void

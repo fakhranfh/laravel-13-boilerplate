@@ -2,16 +2,37 @@
 
 namespace App\Console\Commands\Stubs;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
-use App\Console\Commands\Helpers\SchemaHelper;
+use Illuminate\Support\Str;
 
 class TailwindBladeCreateStubGenerator
 {
-    public function generate(string $name, string $label): string
+    public function generate(string $name, string $label, array $columnInputTypes = []): string
     {
         $labelKebab = Str::kebab($label);
-        $columns = SchemaHelper::getTableColumns($name);
+
+        // Get columns from database or columnInputTypes
+        $tableName = Str::snake(Str::plural($name));
+        $columns = [];
+
+        try {
+            // First try direct Schema method
+            if (Schema::hasTable($tableName)) {
+                $columnNames = Schema::getColumnListing($tableName);
+                // Map column names to type 'string' as default
+                foreach ($columnNames as $col) {
+                    $columns[$col] = 'string';
+                }
+            }
+        } catch (\Exception $e) {
+            // Table might not exist yet
+        }
+
+        // If no columns found and columnInputTypes provided, use those
+        if (empty($columns) && ! empty($columnInputTypes)) {
+            $columns = array_fill_keys(array_keys($columnInputTypes), 'string');
+        }
+
         $exclude = ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'password'];
         $inputs = '';
 
@@ -77,15 +98,35 @@ class TailwindBladeCreateStubGenerator
 </select>
 HTML;
             } else {
-                $field = match ($type) {
-                    'boolean' => $this->generateBooleanField($col),
-                    'text' => $this->generateTextareaField($col),
-                    'date' => $this->generateDateField($col),
-                    'datetime', 'timestamp' => $this->generateDatetimeField($col),
-                    'integer', 'bigint', 'smallint', 'tinyint' => $this->generateNumberField($col),
-                    'float', 'double', 'decimal' => $this->generateDecimalField($col),
-                    default => $this->generateTextField($col),
-                };
+                // Use custom input type if provided, otherwise default based on column type
+                $inputType = $columnInputTypes[$col] ?? null;
+
+                if ($inputType) {
+                    $field = match ($inputType) {
+                        'textarea' => $this->generateTextareaField($col),
+                        'date' => $this->generateDateField($col),
+                        'datetime-local' => $this->generateDatetimeField($col),
+                        'number' => $this->generateNumberField($col),
+                        'email' => $this->generateEmailField($col),
+                        'password' => $this->generatePasswordField($col),
+                        'url' => $this->generateUrlField($col),
+                        'tel' => $this->generateTelField($col),
+                        'checkbox' => $this->generateCheckboxField($col),
+                        'radio' => $this->generateBooleanField($col),
+                        'select' => $this->generateSelectField($col),
+                        default => $this->generateTextField($col),
+                    };
+                } else {
+                    $field = match ($type) {
+                        'boolean' => $this->generateBooleanField($col),
+                        'text' => $this->generateTextareaField($col),
+                        'date' => $this->generateDateField($col),
+                        'datetime', 'timestamp' => $this->generateDatetimeField($col),
+                        'integer', 'bigint', 'smallint', 'tinyint' => $this->generateNumberField($col),
+                        'float', 'double', 'decimal' => $this->generateDecimalField($col),
+                        default => $this->generateTextField($col),
+                    };
+                }
             }
 
             $inputs .= <<<HTML
@@ -231,6 +272,56 @@ HTML;
     {
         return <<<HTML
 <input type="text" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generateEmailField(string $col): string
+    {
+        return <<<HTML
+<input type="email" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generatePasswordField(string $col): string
+    {
+        return <<<HTML
+<input type="password" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generateUrlField(string $col): string
+    {
+        return <<<HTML
+<input type="url" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generateTelField(string $col): string
+    {
+        return <<<HTML
+<input type="tel" id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ isset(\$item) ? \$item->$col : old('$col') }}" required @if(isset(\$isView)) disabled @endif />
+HTML;
+    }
+
+    private function generateCheckboxField(string $col): string
+    {
+        return <<<HTML
+<div class="mt-1 space-y-2">
+  <div class="flex items-center">
+    <input class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" type="checkbox" id="$col" name="$col" value="1"
+      @if((isset(\$item) && \$item->$col == 1) || old('$col') == 1) checked @endif>
+    <label class="ml-2 text-sm text-gray-700 dark:text-gray-300" for="$col">@lang('Yes')</label>
+  </div>
+</div>
+HTML;
+    }
+
+    private function generateSelectField(string $col): string
+    {
+        return <<<HTML
+<select id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required @if(isset(\$isView)) disabled @endif>
+  <option value="">-- @lang('Select') --</option>
+</select>
 HTML;
     }
 }

@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands\Stubs;
 
-use Illuminate\Support\Str;
+use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class ControllerStubGenerator
 {
@@ -72,8 +74,8 @@ class {$name}Controller extends Controller
 
     public function store(Store{$name}Request \$request)
     {
-        \$this->{$camelCaseName}Service->create(\$request->validated());
-        return redirect()->route('{$labelKebab}.show', [])->with('success', __('{$label} created successfully.'));
+        \$item = \$this->{$camelCaseName}Service->create(\$request->validated());
+        return redirect()->route('{$labelKebab}.show', \$item)->with('success', __('{$label} created successfully.'));
     }
 
     public function edit(\$id)
@@ -110,13 +112,13 @@ PHP;
                 $table = $model->getTable();
                 $connection = Schema::getConnection();
 
-                if (!method_exists($connection, 'getDoctrineConnection')) {
+                if (! method_exists($connection, 'getDoctrineConnection')) {
                     return $foreignKeys;
                 }
 
                 $doctrineConn = $connection->getDoctrineConnection();
-                if (!\Doctrine\DBAL\Types\Type::hasType('enum')) {
-                    \Doctrine\DBAL\Types\Type::addType('enum', \Doctrine\DBAL\Types\StringType::class);
+                if (! Type::hasType('enum')) {
+                    Type::addType('enum', StringType::class);
                 }
                 $platform = $doctrineConn->getDatabasePlatform();
                 if (method_exists($platform, 'registerDoctrineTypeMapping')) {
@@ -136,6 +138,7 @@ PHP;
                 return $foreignKeys;
             }
         }
+
         return $foreignKeys;
     }
 
@@ -151,11 +154,12 @@ PHP;
             $relatedTable = $fk['table'];
             $relatedModel = Str::studly(Str::singular($relatedTable));
             $relatedService = "App\\Services\\{$relatedModel}Service";
-            if (!in_array($relatedService, $imported) && $relatedModel !== $name) {
+            if (! in_array($relatedService, $imported) && $relatedModel !== $name) {
                 $imports .= "use {$relatedService};\n";
                 $imported[] = $relatedService;
             }
         }
+
         return $imports;
     }
 
@@ -173,7 +177,7 @@ PHP;
             $i++;
             $relatedTable = $fk['table'];
             $relatedModel = Str::studly(Str::singular($relatedTable));
-            if ($relatedModel !== $name && !in_array($relatedModel, $imported)) {
+            if ($relatedModel !== $name && ! in_array($relatedModel, $imported)) {
                 $camelRelated = Str::camel($relatedModel);
                 if ($i === $fkCount) {
                     $properties .= "protected \${$camelRelated}Service;";
@@ -183,6 +187,7 @@ PHP;
                 $imported[] = $relatedModel;
             }
         }
+
         return $properties;
     }
 
@@ -200,7 +205,7 @@ PHP;
             $i++;
             $relatedTable = $fk['table'];
             $relatedModel = Str::studly(Str::singular($relatedTable));
-            if ($relatedModel !== $name && !in_array($relatedModel, $imported)) {
+            if ($relatedModel !== $name && ! in_array($relatedModel, $imported)) {
                 $camelRelated = Str::camel($relatedModel);
                 if ($i === $fkCount) {
                     $params .= "{$relatedModel}Service \${$camelRelated}Service";
@@ -210,6 +215,7 @@ PHP;
                 $imported[] = $relatedModel;
             }
         }
+
         return rtrim($params, ', ');
     }
 
@@ -227,7 +233,7 @@ PHP;
             $i++;
             $relatedTable = $fk['table'];
             $relatedModel = Str::studly(Str::singular($relatedTable));
-            if ($relatedModel !== $name && !in_array($relatedModel, $imported)) {
+            if ($relatedModel !== $name && ! in_array($relatedModel, $imported)) {
                 $camelRelated = Str::camel($relatedModel);
                 if ($i === $fkCount) {
                     $assignments .= "\$this->{$camelRelated}Service = \${$camelRelated}Service;";
@@ -237,6 +243,7 @@ PHP;
                 $imported[] = $relatedModel;
             }
         }
+
         return $assignments;
     }
 
@@ -253,12 +260,12 @@ PHP;
             $relatedTable = $fk['table'];
             $relatedModel = Str::studly(Str::singular($relatedTable));
             $camelRelated = Str::camel($relatedModel);
-            if (!in_array($relatedModel, $imported) && $relatedModel !== $name) {
+            if (! in_array($relatedModel, $imported) && $relatedModel !== $name) {
                 $foreignDataLines[] = "'{$relatedTable}' => \$this->{$camelRelated}Service->getAll()";
                 $imported[] = $relatedModel;
             }
         }
 
-        return "private function foreignData()\n    {\n        return [\n            " . implode(",\n            ", $foreignDataLines) . "\n        ];\n    }";
+        return "private function foreignData()\n    {\n        return [\n            ".implode(",\n            ", $foreignDataLines)."\n        ];\n    }";
     }
 }
