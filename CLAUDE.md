@@ -119,6 +119,15 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `php artisan make:model --help` to check the available options.
 
+### Creating New Entities with CRUD Generator
+
+- For creating new entities with full CRUD functionality, use the CRUD generator: `php artisan make:rsc {ModelName} --label="Label"`.
+- The CRUD generator automatically creates: model, migration, repository, service, controller, form requests, blade views (index, create, edit, show), and sidebar menu item.
+- Run `php artisan make:rsc --help` to see available options (e.g., `--view-path`, `--repository-service-only`).
+- To delete an entity and its related files: `php artisan delete:rsc {ModelName}` (use `--migrations` flag to also delete migration files).
+- For interactive generation with column configuration: follow the prompts to define columns, types, and form input types. Use `back` to remove the last column if needed.
+- For complete details, examples, and troubleshooting, see `docs/CRUD_GENERATOR.md`.
+
 ## APIs & Eloquent Resources
 
 - For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.
