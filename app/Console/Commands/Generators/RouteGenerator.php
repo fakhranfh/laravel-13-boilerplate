@@ -61,8 +61,8 @@ class RouteGenerator
 
         $routeStub = <<<PHP
 
-        Route::resource('{$routeName}', {$name}Controller::class);
         Route::get('{$routeName}/data/list', [{$name}Controller::class, 'list'])->name('{$routeName}.list');
+        Route::resource('{$routeName}', {$name}Controller::class);
 
     PHP;
 

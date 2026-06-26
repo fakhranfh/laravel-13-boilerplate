@@ -63,8 +63,8 @@ class {$name}Controller extends Controller
 
         return response()->json([
             'data' => \$items->map(fn(\$item) => [
-                'id' => \$item->id,
-                'name' => \$item->name ?? '',
+                'id' => \$item->id ?? '',
+                'name' => \$item->name ?? \$item->title ?? '',
                 'created_at' => \$item->created_at?->format('Y-m-d H:i:s') ?? '',
                 'actions' => [
                     'show' => route('{$labelKebab}.show', \$item->id),

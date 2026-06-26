@@ -1,23 +1,9 @@
-<?php
-
-namespace App\Console\Commands\Stubs;
-
-use Illuminate\Support\Str;
-
-class TailwindBladeIndexStubGenerator
-{
-    public function generate(string $name, string $label): string
-    {
-        $labelKebab = Str::kebab($label);
-        $pluralTitle = $label;
-
-        return <<<'BLADE'
 @extends('layouts.app')
 
-@section('title', __('LABEL'))
+@section('title', __('Product'))
 
 @php
-    $topbarTitle = __('LABEL');
+    $topbarTitle = __('Product');
 @endphp
 
 @section('app-content')
@@ -27,18 +13,18 @@ class TailwindBladeIndexStubGenerator
         <div class="mb-6 flex justify-between items-start">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    {{ __('LABEL') }}
+                    {{ __('Product') }}
                 </h1>
                 <p class="mt-2 text-gray-600 dark:text-gray-400">
-                    {{ __('Manage your LABEL') }}
+                    {{ __('Manage your Product') }}
                 </p>
             </div>
-            <a href="{{ route('ROUTENAME.create') }}"
+            <a href="{{ route('product.create') }}"
                 class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-50 transition ease-in-out duration-150">
                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 9.414V17a1 1 0 11-2 0V9.414L7.707 10.707a1 1 0 01-1.414-1.414l4-4z" clip-rule="evenodd" />
                 </svg>
-                {{ __('New LABEL') }}
+                {{ __('New Product') }}
             </a>
         </div>
 
@@ -59,12 +45,12 @@ class TailwindBladeIndexStubGenerator
         <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    {{ __('All LABEL') }}
+                    {{ __('All Product') }}
                 </h3>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-sm text-gray-700 dark:text-gray-300 display" id="ROUTENAME-table">
+                <table class="w-full text-sm text-gray-700 dark:text-gray-300 display" id="product-table">
                     <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
                             <th class="px-6 py-3 text-left font-semibold">{{ __('ID') }}</th>
@@ -89,11 +75,11 @@ class TailwindBladeIndexStubGenerator
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const table = document.getElementById('ROUTENAME-table');
+            const table = document.getElementById('product-table');
             if (table) {
-                const dataTable = new DataTable('#ROUTENAME-table', {
+                const dataTable = new DataTable('#product-table', {
                     ajax: {
-                        url: '{{ route("ROUTENAME.list") }}',
+                        url: '{{ route("product.list") }}',
                         type: 'GET',
                         dataSrc: 'data',
                         error: function(xhr, error, thrown) {
@@ -130,7 +116,7 @@ class TailwindBladeIndexStubGenerator
                     processing: true,
                     serverSide: false,
                     initComplete: function() {
-                        console.log('DataTable initialized successfully for ROUTENAME');
+                        console.log('DataTable initialized successfully for product');
                     }
                 });
             }
@@ -165,6 +151,3 @@ class TailwindBladeIndexStubGenerator
     </script>
 @endpush
 @endsection
-BLADE;
-    }
-}
