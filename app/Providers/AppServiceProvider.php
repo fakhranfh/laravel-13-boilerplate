@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(LoginResponse::class, function ($app) {
             return new CustomAuthenticatedSessionResponse;
         });
+
     }
 
     /**

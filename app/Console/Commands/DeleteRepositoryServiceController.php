@@ -33,6 +33,14 @@ class DeleteRepositoryServiceController extends Command
             $deleted = true;
         }
 
+        // Delete model
+        $modelPath = app_path("Models/{$name}.php");
+        if (File::exists($modelPath)) {
+            File::delete($modelPath);
+            $this->info("✓ Deleted: Models/{$name}.php");
+            $deleted = true;
+        }
+
         // Delete service
         $servicePath = app_path("Services/{$name}Service.php");
         if (File::exists($servicePath)) {
@@ -129,9 +137,13 @@ class DeleteRepositoryServiceController extends Command
 
         $content = File::get($providerPath);
 
-        // Remove binding
-        $pattern = "/\\\$this->app->bind\(['\"]".preg_quote($name)."RepositoryInterface['\"][^)]*\);?\n?/";
+        // Remove binding using ::class syntax
+        $pattern = "/\\\$this->app->bind\(".preg_quote($name)."RepositoryInterface::class,\s*".preg_quote($name)."Repository::class\);?\s*\n?/";
         $updated = preg_replace($pattern, '', $content);
+
+        // Also remove the import statement for the repository interface and class
+        $updated = preg_replace('/use App\\\\Repositories\\\\'.preg_quote($name).'\\\\'.preg_quote($name)."RepositoryInterface;?\s*\n?/", '', $updated);
+        $updated = preg_replace('/use App\\\\Repositories\\\\'.preg_quote($name).'\\\\'.preg_quote($name)."Repository;?\s*\n?/", '', $updated);
 
         if ($updated !== $content) {
             File::put($providerPath, $updated);
@@ -149,8 +161,9 @@ class DeleteRepositoryServiceController extends Command
 
         $content = File::get($sidebarPath);
 
-        // Remove sidebar item
-        $pattern = '/<!--\\s*'.preg_quote($routeName)."\\s*-->[^<]*<li>[^<]*<a[^>]*route\\(['\"]".preg_quote($routeName)."['\"][^)]*\\)[^<]*<\\/a>[^<]*<\\/li>\\s*/i";
+        // Remove sidebar item with comment and associated <li> block
+        // Pattern matches: <!-- route-name -->...<li>...<a href="{{ route('route-name.suffix'...") }}</li>
+        $pattern = '/<!--\\s*'.preg_quote($routeName)."\\s*-->\\s*\\n<li>[\\s\\S]*?route\\(['\"]".preg_quote($routeName)."(\\.\\w+)?['\"][\\s\\S]*?<\\/li>\\s*\\n/i";
         $updated = preg_replace($pattern, '', $content);
 
         if ($updated !== $content) {
