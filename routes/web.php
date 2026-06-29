@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+
 Route::middleware('guest')->group(function () {
     Route::get('', function () {
         return view('auth.login');
@@ -17,16 +18,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-    });
+});
 
-Route::post('/logout', function (Request $request) {
-    auth()->logout();
-
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect()->route('login');
-})->middleware('auth')->name('logout');
-
-Route::middleware(['auth'])->group(function () {
-    });
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
