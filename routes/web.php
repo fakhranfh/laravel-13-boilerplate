@@ -17,6 +17,7 @@ Route::get('/', [LandingPageController::class, 'show']);
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/edit-profile', [ProfileController::class, 'edit'])->name('edit-profile');
     Route::post('/edit-profile', [ProfileController::class, 'update']);
+    Route::get('/verify-email-change', [ProfileController::class, 'verifyEmailChange'])->name('profile.verify-email-change');
 
     Route::get('/change-password', [PasswordController::class, 'change'])->name('change-password');
     Route::put('/user-password', [PasswordController::class, 'update'])->name('user-password.update');

@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Mail\PendingEmailVerificationMail;
 use App\Models\User;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 
 class UserService
 {
@@ -29,5 +31,20 @@ class UserService
     public function changePassword(User $user, string $password): void
     {
         $this->userRepository->update($user, ['password' => $password]);
+    }
+
+    public function setPendingEmail(User $user, string $pendingEmail): void
+    {
+        $this->userRepository->setPendingEmail($user, $pendingEmail);
+    }
+
+    public function confirmPendingEmail(User $user): void
+    {
+        $this->userRepository->confirmPendingEmail($user);
+    }
+
+    public function sendPendingEmailVerification(User $user, string $verificationUrl): void
+    {
+        Mail::to($user->pending_email)->send(new PendingEmailVerificationMail($user, $verificationUrl));
     }
 }

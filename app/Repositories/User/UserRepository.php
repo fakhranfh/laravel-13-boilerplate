@@ -30,6 +30,20 @@ class UserRepository implements UserRepositoryInterface
         $user->update(['profile_photo_path' => null]);
     }
 
+    public function setPendingEmail(User $user, string $pendingEmail): void
+    {
+        $user->update(['pending_email' => $pendingEmail]);
+    }
+
+    public function confirmPendingEmail(User $user): void
+    {
+        $user->update([
+            'email' => $user->pending_email,
+            'pending_email' => null,
+            'email_verified_at' => now(),
+        ]);
+    }
+
     private function removeProfilePhotoFile(User $user): void
     {
         if ($user->profile_photo_path) {

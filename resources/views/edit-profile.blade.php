@@ -13,6 +13,15 @@
             <p class="font-body-md text-body-md text-success">{{ session('success') }}</p>
         </div>
     @endif
+
+    @if(session('pending_email_sent'))
+        <div class="mb-space-lg px-gutter py-space-md bg-warning/10 border border-warning/20 rounded-lg flex items-start gap-space-md">
+            <span class="material-symbols-outlined text-warning text-[20px] mt-0.5" data-weight="fill">mark_email_unread</span>
+            <p class="font-body-md text-body-md text-on-surface">
+                A verification email has been sent to <strong>{{ session('pending_email_sent') }}</strong>. Please check your inbox and click the link to confirm the email change.
+            </p>
+        </div>
+    @endif
     @push('styles')
         <style>
             .profile-card {
@@ -69,7 +78,7 @@
                 </div>
 
                 <!-- Form Fields -->
-                <form class="space-y-space-lg" method="POST" action="{{ route('edit-profile') }}" enctype="multipart/form-data">
+                <form id="edit-profile-form" class="space-y-space-lg" method="POST" action="{{ route('edit-profile') }}" enctype="multipart/form-data">
                     @csrf
 
                     <input type="file" id="profile_photo" name="profile_photo" accept="image/jpeg,image/png,image/gif" style="display: none;" />
@@ -80,15 +89,27 @@
                         <div class="space-y-space-xs">
                             <div class="flex items-center gap-space-xs">
                                 <label class="font-label-md text-label-md text-on-surface" for="email">Email Address</label>
-                                <span class="inline-flex items-center gap-space-xs px-space-xs py-space-xxs rounded-full bg-success/10 border border-success/20">
-                                    <span class="material-symbols-outlined text-[12px] text-success" data-weight="fill">check_circle</span>
-                                    <span class="font-label-sm text-label-sm text-success">Verified</span>
-                                </span>
+                                @if(auth()->user()->pending_email)
+                                    <span class="inline-flex items-center gap-space-xs px-space-xs py-space-xxs rounded-full bg-warning/10 border border-warning/20">
+                                        <span class="material-symbols-outlined text-[12px] text-warning" data-weight="fill">schedule</span>
+                                        <span class="font-label-sm text-label-sm text-warning">Pending Verification</span>
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-space-xs px-space-xs py-space-xxs rounded-full bg-success/10 border border-success/20">
+                                        <span class="material-symbols-outlined text-[12px] text-success" data-weight="fill">check_circle</span>
+                                        <span class="font-label-sm text-label-sm text-success">Verified</span>
+                                    </span>
+                                @endif
                             </div>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary/60 text-[20px]">mail</span>
                                 <input class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-space-sm pl-10 pr-space-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('email') border-error @enderror" id="email" name="email" type="email" value="{{ auth()->user()->email }}" required />
                             </div>
+                            @if(auth()->user()->pending_email)
+                                <p class="font-body-sm text-body-sm text-secondary mt-space-xs">
+                                    Pending change to <strong>{{ auth()->user()->pending_email }}</strong>. Check your inbox to verify the new email.
+                                </p>
+                            @endif
                             @error('email')
                                 <p class="text-error text-body-sm font-body-sm mt-space-xs">{{ $message }}</p>
                             @enderror
@@ -119,9 +140,10 @@
                             <a href="{{ route('dashboard') }}" class="px-space-lg py-space-sm rounded-lg border border-outline-variant bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors inline-block">
                                 Cancel
                             </a>
-                            <button class="px-space-lg py-space-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-space-sm shadow-sm" type="submit">
-                                <span class="material-symbols-outlined text-[18px]">save</span>
-                                Save Changes
+                            <button id="save-changes-btn" class="px-space-lg py-space-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-space-sm shadow-sm disabled:opacity-60 disabled:cursor-not-allowed" type="submit">
+                                <span id="save-icon" class="material-symbols-outlined text-[18px]">save</span>
+                                <span id="save-spinner" class="hidden w-[18px] h-[18px] border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></span>
+                                <span id="save-label">Save Changes</span>
                             </button>
                         </div>
                     </div>
@@ -145,6 +167,19 @@
                     };
                     reader.readAsDataURL(file);
                 }
+            });
+
+            document.getElementById('edit-profile-form')?.addEventListener('submit', function() {
+                const btn = document.getElementById('save-changes-btn');
+                const icon = document.getElementById('save-icon');
+                const spinner = document.getElementById('save-spinner');
+                const label = document.getElementById('save-label');
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-on-primary-fixed-variant');
+                btn.classList.add('opacity-60', 'cursor-not-allowed');
+                icon.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                label.textContent = 'Saving...';
             });
 
             removePhotoBtn?.addEventListener('click', function(e) {
