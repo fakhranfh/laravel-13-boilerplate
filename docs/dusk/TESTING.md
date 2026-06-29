@@ -12,7 +12,9 @@ relevant screenshots.
 4. [Email Verification](#4-email-verification)
 5. [Forgot & Reset Password](#5-forgot--reset-password)
 6. [Logout & Page Protection](#6-logout--page-protection)
-7. [Running Tests](#running-tests)
+7. [Edit Profile](#7-edit-profile)
+8. [Password Change Alert](#8-password-change-alert)
+9. [Running Tests](#running-tests)
 
 ---
 
@@ -26,6 +28,8 @@ relevant screenshots.
 | `tests/Browser/Auth/EmailVerificationTest.php` | Email Verification | 4 |
 | `tests/Browser/Auth/PasswordResetTest.php` | Forgot & Reset Password | 6 |
 | `tests/Browser/Auth/LogoutTest.php` | Logout & Page Protection | 3 |
+| `tests/Browser/EditProfileTest.php` | Edit Profile | 5 |
+| `tests/Browser/PasswordChangeAlertTest.php` | Password Change Alert | 1 |
 
 ---
 
@@ -58,13 +62,13 @@ different navigation links for guests and authenticated users.
 File: `tests/Browser/Auth/RegistrationTest.php`
 
 New account registration with **server-side** and **client-side** password strength
-validation (JavaScript). On success, user is redirected to email verification page.
+validation (JavaScript). On success, user is redirected to the email verification page.
 
-![Halaman Registrasi](images/register-page.png)
+![Registration Page](images/register-page.png)
 
-Example display when password doesn't meet requirements / already taken:
+Example display when password doesn't meet requirements or email is already taken:
 
-![Registration Validation](images/register-error.png)
+![Registration Error](images/register-error.png)
 
 ### Test Scenarios
 
@@ -95,11 +99,11 @@ File: `tests/Browser/Auth/LoginTest.php`
 Authentication of registered users. Successful login redirects to `/dashboard`,
 while incorrect credentials display an error message.
 
-![Halaman Login](images/login-page.png)
+![Login Page](images/login-page.png)
 
 Display when credentials are wrong:
 
-![Login Failed](images/login-error.png)
+![Login Error](images/login-error.png)
 
 ### Test Scenarios
 
@@ -121,92 +125,140 @@ File: `tests/Browser/Auth/EmailVerificationTest.php`
 Users who haven't verified their email are redirected to a verification notice page
 after login. Users can resend the verification link or logout.
 
-![Notifikasi Verifikasi Email](images/email-verify-notice.png)
+![Email Verification Notice](images/email-verify-notice.png)
 
-### Skenario yang diuji
+### Test Scenarios
 
-| Skenario | Harapan |
+| Scenario | Expected |
 | --- | --- |
-| `unverified user sees email verification notice after login` | Diarahkan ke `/email/verify`. |
-| `verified user goes to dashboard after login` | Diarahkan ke `/dashboard`. |
-| `resend verification email button shows success message` | Pesan "A new verification link has been sent". |
-| `logout button on verify page works` | Tombol **Log out** mengembalikan ke `/login`. |
+| `unverified user sees email verification notice after login` | Redirected to `/email/verify`. |
+| `verified user goes to dashboard after login` | Redirected to `/dashboard`. |
+| `resend verification email button shows success message` | Message "A new verification link has been sent". |
+| `logout button on verify page works` | **Log out** button redirects to `/login`. |
 
 ---
 
-## 5. Lupa & Reset Password
+## 5. Forgot & Reset Password
 
-Berkas: `tests/Browser/Auth/PasswordResetTest.php`
+File: `tests/Browser/Auth/PasswordResetTest.php`
 
-Alur pemulihan password: meminta tautan reset melalui email, lalu menetapkan
-password baru menggunakan token yang valid. Notifikasi email di-*fake* selama
-pengujian.
+Password recovery flow: request a reset link via email, then set a new password
+using a valid token. Email notifications are faked during testing.
 
-![Halaman Lupa Password](images/forgot-password-page.png)
+![Forgot Password Page](images/forgot-password-page.png)
 
-Halaman penetapan password baru (melalui token):
+New password form (accessed via token):
 
-![Halaman Reset Password](images/reset-password-page.png)
+![Reset Password Page](images/reset-password-page.png)
 
-### Skenario yang diuji
+### Test Scenarios
 
-| Skenario | Harapan |
+| Scenario | Expected |
 | --- | --- |
-| `forgot password page can be rendered` | Menampilkan form & tombol "Send Instructions". |
-| `reset link can be requested with valid email` | Pesan "Link has been sent to your email address". |
-| `reset link fails with unregistered email` | Pesan "We can't find a user with that email address". |
-| `reset password page loads with valid token` | Form New Password & Confirm New Password tampil. |
-| `reset password shows js error with weak password` | Error JS: minimal 8 karakter. |
-| `forgot password page has back to login link` | Tautan "Back to log in" mengarah ke `/login`. |
+| `forgot password page can be rendered` | Displays form and "Send Instructions" button. |
+| `reset link can be requested with valid email` | Message "Link has been sent to your email address". |
+| `reset link fails with unregistered email` | Message "We can't find a user with that email address". |
+| `reset password page loads with valid token` | New Password and Confirm New Password fields are displayed. |
+| `reset password shows js error with weak password` | JS error: minimum 8 characters. |
+| `forgot password page has back to login link` | "Back to log in" link leads to `/login`. |
 
 ---
 
-## 6. Logout & Proteksi Halaman
+## 6. Logout & Page Protection
 
-Berkas: `tests/Browser/Auth/LogoutTest.php`
+File: `tests/Browser/Auth/LogoutTest.php`
 
-Memastikan pengguna dapat keluar dan halaman terproteksi (`/dashboard`) tidak
-dapat diakses tanpa autentikasi.
+Ensures users can log out and that protected pages (`/dashboard`) cannot be accessed
+without authentication.
 
 ![Dashboard](images/dashboard.png)
 
-### Skenario yang diuji
+### Test Scenarios
 
-| Skenario | Harapan |
+| Scenario | Expected |
 | --- | --- |
-| `authenticated user sees logout button and can logout` | Tombol **Logout** mengembalikan ke `/login`. |
-| `after logout user cannot access protected pages` | Setelah logout, halaman login (`Email Address`) tampil. |
-| `guest browsing dashboard is redirected to login` | Tamu membuka `/dashboard` dialihkan ke `/login`. |
+| `authenticated user sees logout button and can logout` | **Logout** button redirects to `/login`. |
+| `after logout user cannot access protected pages` | After logout, the login page (`Email Address`) is shown. |
+| `guest browsing dashboard is redirected to login` | Guest visiting `/dashboard` is redirected to `/login`. |
 
 ---
 
-## Cara Menjalankan Pengujian
+## 7. Edit Profile
 
-Prasyarat:
+File: `tests/Browser/EditProfileTest.php`
 
-- Aset frontend sudah ter-*build*: `npm run build`
-- Database tersedia & ter-migrasi (Dusk memakai trait `DatabaseMigrations`)
-- Google Chrome terpasang (ChromeDriver disediakan oleh paket Dusk)
+Allows authenticated users to update their name, email address, and profile photo.
+Changing the email triggers a pending verification flow before the new address is applied.
 
-Menjalankan seluruh pengujian Dusk:
+![Edit Profile Page](images/edit-profile-page.png)
+
+After successfully saving changes:
+
+![Edit Profile Success](images/edit-profile-success.png)
+
+### Test Scenarios
+
+| Scenario | Expected |
+| --- | --- |
+| `edit profile page can be rendered` | Edit Profile page is accessible for authenticated users. |
+| `user can update name successfully` | Name is updated and message "Profile updated successfully." is shown. |
+| `update profile fails when name is empty` | Message "Full name is required". |
+| `changing email triggers pending verification notice` | Pending email address is shown on the page. |
+| `update profile fails when email format is invalid` | Message "Please enter a valid email address". |
+
+---
+
+## 8. Password Change Alert
+
+File: `tests/Browser/PasswordChangeAlertTest.php`
+
+Verifies that a success alert is displayed after a user successfully changes their
+password from the `/change-password` page.
+
+![Change Password Page](images/change-password-page.png)
+
+After successfully updating the password:
+
+![Change Password Success](images/change-password-success.png)
+
+### Test Scenarios
+
+| Scenario | Expected |
+| --- | --- |
+| `password change displays success alert` | After submitting valid current and new passwords, the message "Your password has been changed successfully" is displayed. |
+
+---
+
+## Running Tests
+
+Prerequisites:
+
+- Frontend assets are built: `npm run build`
+- Database is available and migrated (Dusk uses the `DatabaseMigrations` trait)
+- Google Chrome is installed (ChromeDriver is provided by the Dusk package)
+
+Run all Dusk tests:
 
 ```bash
 php artisan dusk
 ```
 
-Menjalankan satu berkas tertentu:
+Run a specific test file:
 
 ```bash
 php artisan dusk tests/Browser/Auth/LoginTest.php
 ```
 
-Menjalankan berdasarkan nama skenario:
+Run by test name:
 
 ```bash
 php artisan dusk --filter="user can login with valid credentials"
 ```
 
-> **Memperbarui screenshot dokumentasi**: tangkapan layar pada folder
-> `docs/dusk/images/` dibuat dengan memanggil `$browser->screenshot()` pada
-> tiap halaman fitur. Jalankan kembali skrip penangkap screenshot bila tampilan
-> UI berubah agar dokumentasi tetap akurat.
+> **Updating documentation screenshots**: screenshots in `docs/dusk/images/` are
+> captured by running the dedicated script below. Re-run it whenever the UI changes
+> to keep the documentation accurate.
+
+```bash
+php artisan dusk tests/Browser/CaptureDocScreenshotsTest.php
+```

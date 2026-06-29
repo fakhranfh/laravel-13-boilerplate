@@ -2,7 +2,7 @@
 
 A production-ready Laravel starter kit built for developers who need **full control** over their application — not an opinionated admin panel.
 
-Unlike Filament, this boilerplate generates clean, conventional Laravel code (controllers, Blade views, form requests) that you own and can freely customize without being locked into a third-party component ecosystem. It follows a strict **Repository Pattern** architecture, ships with server-side DataTables, and includes a complete testing suite (Pest, Dusk, K6) — giving you a solid foundation for long-term, maintainable applications.
+This boilerplate generates clean, conventional Laravel code (controllers, Blade views, form requests) that you own and can freely customize without being locked into a third-party component ecosystem. It follows a strict **Repository Pattern** architecture, ships with server-side DataTables, and includes a complete testing suite (Pest, Dusk, K6) — giving you a solid foundation for long-term, maintainable applications.
 
 ## Tech Stack
 
@@ -16,6 +16,49 @@ Unlike Filament, this boilerplate generates clean, conventional Laravel code (co
 | Frontend | Tailwind CSS | v4 |
 | Bundler | Vite | — |
 | Code Style | Laravel Pint | v1 |
+
+---
+
+## Screenshots
+
+### Landing Page
+The public entry point with a hero section, application branding, and navigation links that adapt based on authentication state.
+
+![Landing Page](docs/dusk/images/landing-page.png)
+
+### Authentication
+
+| Register | Login |
+|---|---|
+| ![Register](docs/dusk/images/register-page.png) | ![Login](docs/dusk/images/login-page.png) |
+
+| Register Error | Login Error |
+|---|---|
+| ![Register Error](docs/dusk/images/register-error.png) | ![Login Error](docs/dusk/images/login-error.png) |
+
+### Email Verification & Password Recovery
+
+| Email Verification Notice | Forgot Password |
+|---|---|
+| ![Email Verification](docs/dusk/images/email-verify-notice.png) | ![Forgot Password](docs/dusk/images/forgot-password-page.png) |
+
+| Reset Password | |
+|---|---|
+| ![Reset Password](docs/dusk/images/reset-password-page.png) | |
+
+### Dashboard & Profile
+
+| Dashboard | Edit Profile |
+|---|---|
+| ![Dashboard](docs/dusk/images/dashboard.png) | ![Edit Profile](docs/dusk/images/edit-profile-page.png) |
+
+Profile updated successfully:
+
+![Edit Profile Success](docs/dusk/images/edit-profile-success.png)
+
+| Change Password | Change Password Success |
+|---|---|
+| ![Change Password](docs/dusk/images/change-password-page.png) | ![Change Password Success](docs/dusk/images/change-password-success.png) |
 
 ---
 
