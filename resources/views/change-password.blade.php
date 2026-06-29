@@ -127,9 +127,9 @@
                             <a href="{{ route('dashboard') }}" class="px-space-lg py-space-sm rounded-lg border border-outline-variant bg-surface text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors inline-block">
                                 Cancel
                             </a>
-                            <button class="px-space-lg py-space-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-space-sm shadow-sm" type="submit">
-                                <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                                Update Password
+                            <button id="update-password-btn" class="px-space-lg py-space-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-space-sm shadow-sm" type="submit">
+                                <span id="submit-icon" class="material-symbols-outlined text-[18px]">check_circle</span>
+                                <span id="submit-text">Update Password</span>
                             </button>
                         </div>
                     </form>
@@ -177,6 +177,30 @@
             .password-strength.strong {
                 background-color: rgb(34, 197, 94);
                 width: 100%;
+            }
+
+            @keyframes spin {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .animate-spin {
+                animation: spin 1s linear infinite;
+            }
+
+            #update-password-btn:disabled {
+                background-color: #a1a7b8;
+                color: #ffffff;
+                cursor: not-allowed;
+                opacity: 0.7;
+            }
+
+            #update-password-btn:disabled:hover {
+                background-color: #a1a7b8;
             }
         </style>
     @endpush
@@ -230,6 +254,20 @@
                 } else {
                     strengthBar.classList.add('strong');
                 }
+            });
+
+            const btn = document.getElementById('update-password-btn');
+            const icon = document.getElementById('submit-icon');
+            const text = document.getElementById('submit-text');
+
+            btn?.addEventListener('click', () => {
+                if (!btn.form.checkValidity()) return;
+                
+                icon.textContent = 'hourglass_empty';
+                icon.classList.add('animate-spin');
+                text.textContent = 'Updating...';
+                btn.disabled = true;
+                btn.form.submit();
             });
         </script>
     @endpush
