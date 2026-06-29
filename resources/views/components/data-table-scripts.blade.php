@@ -8,7 +8,7 @@ function loadTableData(tableId, listUrl, renderCallback) {
         return;
     }
 
-    fetch(listUrl)
+    fetch(listUrl, { credentials: 'include' })
         .then(r => r.json())
         .then(data => {
             tbody.innerHTML = '';
@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const functionName = 'load' + tableId.charAt(0).toUpperCase() + tableId.slice(1);
             if (typeof window[functionName] === 'function') {
                 window[functionName]();
+            } else {
+                console.warn('[DataTable] Function not found:', functionName);
             }
         }
     });

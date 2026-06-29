@@ -9,7 +9,7 @@ class TailwindBladeIndexStubGenerator
     public function generate(string $name, string $label): string
     {
         $labelKebab = Str::kebab($label);
-        $tableId = lcfirst(str_replace('-', '', ucwords($labelKebab, '-'))) . 'Table';
+        $tableId = lcfirst(str_replace('-', '', ucwords($labelKebab, '-'))).'Table';
 
         return <<<BLADE
 @extends('layouts.app')
@@ -93,7 +93,7 @@ function load{$tableId}() {
     loadTableData('{$tableId}', '{{ route("ROUTENAME.list") }}', function(item) {
         const row = document.createElement('tr');
         row.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-700';
-        row.innerHTML = \`
+        row.innerHTML = `
             <td class="px-6 py-3">\${item.id}</td>
             <td class="px-6 py-3">\${item.name}</td>
             <td class="px-6 py-3">\${item.created_at}</td>
@@ -104,7 +104,7 @@ function load{$tableId}() {
                     <button onclick="deleteItem('\${item.actions.delete}')" class="text-red-600 hover:text-red-900 text-sm font-medium">{{ __('Delete') }}</button>
                 </div>
             </td>
-        \`;
+        `;
         return row;
     });
 }

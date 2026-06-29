@@ -10,13 +10,6 @@
                     <span class="font-body-md text-body-md">Dashboard</span>
                 </a>
             </li>
-<!-- Test Item -->
-<li>
-    <a href="{{ route('test-item.index') }}" class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-black hover:bg-primary/10 transition-colors duration-150 {{ request()->routeIs('test-item.*') ? 'bg-primary/20 text-primary' : 'hover:text-on-surface' }}">
-        <span class="material-symbols-outlined text-[24px]">folder</span>
-        <span class="font-body-md text-body-md">Test Item</span>
-    </a>
-</li>
         </ul>
     </nav>
 </aside>

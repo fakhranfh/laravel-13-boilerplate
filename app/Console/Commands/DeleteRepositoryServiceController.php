@@ -117,13 +117,17 @@ class DeleteRepositoryServiceController extends Command
         $content = File::get($routesPath);
         $routeName = Str::kebab($name);
 
-        // Remove API datatable list route
-        $pattern = "/Route::get\(['\"]".preg_quote($routeName)."\\/data\\/list['\"][^)]*\);?\s*\n?/";
+        // Remove API datatable list route (with or without method chaining)
+        $pattern = "/Route::get\(['\"]".preg_quote($routeName)."\\/data\\/list['\"][^;]*\);?\s*\n?/";
         $updated = preg_replace($pattern, '', $content);
 
-        // Remove resource route
-        $pattern = "/Route::resource\(['\"]".preg_quote($routeName)."['\"][^)]*\);?\n?/";
+        // Remove resource route (with or without method chaining)
+        $pattern = "/Route::resource\(['\"]".preg_quote($routeName)."['\"][^;]*\);?\s*\n?/";
         $updated = preg_replace($pattern, '', $updated);
+
+        // Remove orphaned method chains like ->name('route.name'); when the Route:: is deleted
+        $pattern = "/\\s*->name\\(['\"]".preg_quote($routeName)."(\\.\\w+)?['\"]\\);?\s*\n/";
+        $updated = preg_replace($pattern, "\n", $updated);
 
         // Remove controller import
         $pattern = '/use App\\\\Http\\\\Controllers\\\\'.preg_quote($name)."Controller;?\s*\n?/";
@@ -170,8 +174,8 @@ class DeleteRepositoryServiceController extends Command
         $content = File::get($sidebarPath);
 
         // Remove sidebar item with comment and associated <li> block
-        // Pattern matches: <!-- route-name -->...<li>...<a href="{{ route('route-name.suffix'...") }}</li>
-        $pattern = '/<!--\\s*'.preg_quote($routeName)."\\s*-->\\s*\\n<li>[\\s\\S]*?route\\(['\"]".preg_quote($routeName)."(\\.\\w+)?['\"][\\s\\S]*?<\\/li>\\s*\\n/i";
+        // More flexible pattern to handle various whitespace and formatting
+        $pattern = '/\\s*<!--[^-]*'.preg_quote($routeName).'[^-]*-->\\s*\\n\\s*<li>[\\s\\S]*?route\\([\'"]'.preg_quote($routeName).'(\\.\\w+)?[\'"][\\s\\S]*?<\\/li>\\s*\\n/i';
         $updated = preg_replace($pattern, '', $content);
 
         if ($updated !== $content) {
