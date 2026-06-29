@@ -21,12 +21,12 @@ test('unauthenticated user cannot view edit profile page', function () {
     $response->assertRedirect('/login');
 });
 
-test('user can update profile name and email', function () {
+test('user can update profile name without changing email', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/edit-profile', [
         'name' => 'Updated Name',
-        'email' => 'newemail@example.com',
+        'email' => $user->email,
     ]);
 
     $response->assertRedirect('/edit-profile')
@@ -35,7 +35,24 @@ test('user can update profile name and email', function () {
     $this->assertDatabaseHas('users', [
         'id' => $user->id,
         'name' => 'Updated Name',
+    ]);
+});
+
+test('user changing email triggers verification and stores pending email', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('/edit-profile', [
+        'name' => $user->name,
         'email' => 'newemail@example.com',
+    ]);
+
+    $response->assertRedirect('/edit-profile')
+        ->assertSessionHas('pending_email_sent', 'newemail@example.com');
+
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'email' => $user->email,
+        'pending_email' => 'newemail@example.com',
     ]);
 });
 
@@ -55,7 +72,7 @@ test('user can upload profile photo', function () {
     ]);
 
     $response->assertRedirect('/edit-profile');
-    Storage::disk('public')->assertExists('profile-photos/' . $file->hashName());
+    Storage::disk('public')->assertExists('profile-photos/'.$file->hashName());
 });
 
 test('user can remove profile photo', function () {
