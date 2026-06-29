@@ -357,6 +357,26 @@ class MakeRepositoryServiceController extends Command
         );
     }
 
+    private function getColumnTypes(string $tableName): array
+    {
+        $columnTypes = [];
+
+        try {
+            $connection = Schema::getConnection();
+            if (method_exists($connection, 'getDoctrineSchemaManager')) {
+                $sm = $connection->getDoctrineSchemaManager();
+                $doctrineTable = $sm->introspectTable($tableName);
+                foreach ($doctrineTable->getColumns() as $column) {
+                    $columnTypes[$column->getName()] = $column->getType()->getName();
+                }
+            }
+        } catch (\Exception) {
+            // If we can't get types from Doctrine, return empty array
+        }
+
+        return $columnTypes;
+    }
+
     private function getInputTypeOptionsForColumnType(string $columnType): array
     {
         $options = match ($columnType) {
@@ -393,10 +413,10 @@ class MakeRepositoryServiceController extends Command
 
         // Get column types
         $columnTypes = [];
+        $columnTypesMap = $this->getColumnTypes($tableName);
         foreach ($columns as $col) {
             if (! in_array($col, $exclude)) {
-                $column = Schema::getColumn($tableName, $col);
-                $columnTypes[$col] = $column['type'] ?? 'string';
+                $columnTypes[$col] = $columnTypesMap[$col] ?? 'string';
             }
         }
 

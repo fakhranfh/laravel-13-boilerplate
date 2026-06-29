@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 Route::middleware('guest')->group(function () {
     Route::get('', function () {
         return view('auth.login');
@@ -18,7 +17,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-});
+
+    ->name('test-item.list');
+    });
 
 Route::post('/logout', function (Request $request) {
     auth()->logout();
