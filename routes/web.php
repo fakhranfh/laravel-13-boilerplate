@@ -17,8 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-
-    ->name('test-item.list');
+    ->name('article.list');
     });
 
 Route::post('/logout', function (Request $request) {
