@@ -21,6 +21,8 @@
                         "on-primary-fixed": "#00174b",
                         "surface-tint": "#0053db",
                         success: "#16A34A",
+                        "success-container": "#f0fdf4",
+                        "on-success-container": "#15803d",
                         primary: "#004ac6",
                         "on-primary": "#ffffff",
                         "on-primary-container": "#eeefff",
