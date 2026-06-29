@@ -35,14 +35,17 @@ test('user can update password', function () {
         'password' => bcrypt('OldPassword@123456'),
     ]);
 
-    $response = $this->actingAs($user)->put(route('user-password.update'), [
+    $response = $this->actingAs($user)->put('/user/password', [
         'current_password' => 'OldPassword@123456',
         'password' => 'NewPassword@654321',
         'password_confirmation' => 'NewPassword@654321',
     ]);
 
-    // Should redirect (either to dashboard or home)
+    // Fortify redirects back with 'status' session key
     $response->assertStatus(302);
+
+    // Verify status message is in session (Fortify uses 'status' key)
+    $response->assertSessionHas('status');
 
     // Verify the password was actually changed
     $user->refresh();

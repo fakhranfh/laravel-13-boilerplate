@@ -17,7 +17,7 @@
                     <p class="font-body-md text-body-md text-secondary mb-space-xl">Update your password to keep your account secure. Use a strong, unique password.</p>
 
                     <!-- Form -->
-                    <form class="space-y-space-lg" method="POST" action="{{ route('user-password.update') }}">
+                    <form class="space-y-space-lg" method="POST" action="/user/password">
                         @csrf
                         @method('PUT')
 

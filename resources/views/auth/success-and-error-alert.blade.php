@@ -1,4 +1,4 @@
-@if (session('success'))
+@if (session('success') || session('status'))
 <div id="success-alert" class="mb-6 rounded-lg bg-success-container p-4 border border-success/30">
     <div class="flex">
         <div class="flex-shrink-0">
@@ -7,7 +7,7 @@
         <div class="ml-3 flex-1">
             <h3 class="font-label-md text-label-md text-success">Success</h3>
             <div class="mt-2 font-body-sm text-body-sm text-on-success-container">
-                {{ session('success') }}
+                {{ session('success') ?? session('status') }}
             </div>
         </div>
         <button type="button" class="flex-shrink-0 ml-3 text-success hover:text-on-success-container transition-colors" onclick="document.getElementById('success-alert').classList.add('hidden');" aria-label="Close alert">
