@@ -17,7 +17,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-    ->name('article.list');
     });
 
 Route::post('/logout', function (Request $request) {
@@ -28,3 +27,6 @@ Route::post('/logout', function (Request $request) {
 
     return redirect()->route('login');
 })->middleware('auth')->name('logout');
+
+Route::middleware(['auth'])->group(function () {
+    });
