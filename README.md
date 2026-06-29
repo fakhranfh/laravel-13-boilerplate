@@ -1,6 +1,8 @@
 # Laravel 13 Boilerplate
 
-A production-ready Laravel starter kit with authentication, CRUD scaffolding, DataTables integration, and a comprehensive testing infrastructure.
+A production-ready Laravel starter kit built for developers who need **full control** over their application — not an opinionated admin panel.
+
+Unlike Filament, this boilerplate generates clean, conventional Laravel code (controllers, Blade views, form requests) that you own and can freely customize without being locked into a third-party component ecosystem. It follows a strict **Repository Pattern** architecture, ships with server-side DataTables, and includes a complete testing suite (Pest, Dusk, K6) — giving you a solid foundation for long-term, maintainable applications.
 
 ## Tech Stack
 
