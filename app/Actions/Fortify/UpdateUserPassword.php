@@ -25,7 +25,12 @@ class UpdateUserPassword implements UpdatesUserPasswords
             'current_password' => ['required', 'string', 'current_password:web'],
             'password' => $this->passwordRules(),
         ], [
-            'current_password.current_password' => __('The provided password does not match your current password.'),
+            'current_password.required' => __('Current password is required.'),
+            'current_password.current_password' => __('Your current password is incorrect. Please try again.'),
+            'password.required' => __('New password is required.'),
+            'password.min' => __('Password must be at least 8 characters long.'),
+            'password.regex' => __('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'),
+            'password.confirmed' => __('Password confirmation does not match.'),
         ])->validateWithBag('updatePassword');
 
         $user->forceFill([

@@ -20,7 +20,7 @@ test('password change page shows success alert after update', function () {
     // Verify session has status message
     expect($response->getSession()->has('status'))->toBeTrue();
 
-    echo "Redirect URL: " . $response->headers->get('Location') . PHP_EOL;
+    echo 'Redirect URL: '.$response->headers->get('Location').PHP_EOL;
 
     // Navigate to change-password page with session
     $followResponse = $this->actingAs($user)
@@ -40,7 +40,10 @@ test('password change page shows success alert after update', function () {
     expect($html)->toContain('success-alert');
     expect($html)->toContain('Success');
     expect($html)->toContain('check_circle');
-    expect($html)->toContain('password-updated'); // Fortify's default status key
+
+    // Verify user-friendly message is displayed
+    expect($html)->toContain('Your password has been changed successfully');
+    expect($html)->toContain('Please remember to use your new password for future logins');
 
     // Verify alert styling classes are present
     expect($html)->toContain('bg-success-container');
