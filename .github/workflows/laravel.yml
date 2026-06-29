@@ -41,7 +41,7 @@ jobs:
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
     - name: Install NPM dependencies
-      run: npm ci
+      run: npm ci --ignore-platform
 
     - name: Build assets
       run: npm run build
