@@ -89,17 +89,6 @@ Authenticated users can manage their account from the profile page:
 
 ---
 
-### Dashboard
-
-Protected dashboard accessible only to verified users, displaying:
-
-- Total registered users
-- Revenue data
-- System status
-- Recent activity log
-
----
-
 ### CRUD Generator (`make:rsc`)
 
 A custom Artisan command that scaffolds a complete CRUD module in seconds:
