@@ -115,6 +115,11 @@ class {$name}Controller extends Controller
     public function destroy(\$id)
     {
         \$this->{$camelCaseName}Service->delete(\$id);
+
+        if (request()->expectsJson()) {
+            return response()->json(['message' => __('Item deleted successfully.')]);
+        }
+
         return redirect()->route('{$labelKebab}.index')->with('success', __('{$label} deleted successfully.'));
     }
 }
@@ -143,6 +148,9 @@ PHP;
                     $platform->registerDoctrineTypeMapping('enum', 'string');
                 }
                 $sm = $connection->getDoctrineSchemaManager();
+                if (! Schema::hasTable($table)) {
+                    return $foreignKeys;
+                }
                 $doctrineTable = $sm->introspectTable($table);
                 foreach ($doctrineTable->getForeignKeys() as $fk) {
                     foreach ($fk->getLocalColumns() as $localCol) {
