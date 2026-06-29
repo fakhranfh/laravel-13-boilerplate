@@ -71,12 +71,12 @@
                     </div>
                 </div>
 
-                <input type="file" id="profile_photo" name="profile_photo" accept="image/jpeg,image/png,image/gif" style="display: none;" />
-                <input type="hidden" id="remove_photo" name="remove_photo" value="0" />
-
                 <!-- Form Fields -->
                 <form class="space-y-space-lg" method="POST" action="{{ route('edit-profile') }}" enctype="multipart/form-data">
                     @csrf
+
+                    <input type="file" id="profile_photo" name="profile_photo" accept="image/jpeg,image/png,image/gif" style="display: none;" />
+                    <input type="hidden" id="remove_photo" name="remove_photo" value="0" />
 
                     <div class="grid grid-cols-1 gap-space-lg">
                         <!-- Email Address -->
