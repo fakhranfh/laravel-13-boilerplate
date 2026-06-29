@@ -7,6 +7,19 @@
 @endphp
 
 @section('app-content')
+    @if (session('success'))
+        <div class="mb-space-lg max-w-2xl mx-auto">
+            <div class="bg-success-container border border-success text-on-success-container rounded-lg p-space-md">
+                <div class="flex gap-space-md">
+                    <span class="material-symbols-outlined flex-shrink-0">check_circle</span>
+                    <div>
+                        <p class="font-label-md text-label-md">{{ session('success') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @push('styles')
         <style>
             .password-card {

@@ -25,4 +25,9 @@ class UserService
     {
         $this->userRepository->removeProfilePhoto($user);
     }
+
+    public function changePassword(User $user, string $password): void
+    {
+        $this->userRepository->update($user, ['password' => $password]);
+    }
 }

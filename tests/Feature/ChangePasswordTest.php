@@ -35,7 +35,7 @@ test('user can update password', function () {
         'password' => bcrypt('OldPassword@123456'),
     ]);
 
-    $response = $this->actingAs($user)->put('/user/password', [
+    $response = $this->actingAs($user)->put(route('user-password.update'), [
         'current_password' => 'OldPassword@123456',
         'password' => 'NewPassword@654321',
         'password_confirmation' => 'NewPassword@654321',
