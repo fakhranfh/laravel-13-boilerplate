@@ -9,8 +9,7 @@
                     <span class="material-symbols-outlined text-[24px]">dashboard</span>
                     <span class="font-body-md text-body-md">Dashboard</span>
                 </a>
-            </li>
-        </ul>
+            </li>        </ul>
     </nav>
 </aside>
 

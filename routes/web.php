@@ -7,7 +7,6 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-
 Route::middleware('guest')->group(function () {
     Route::get('', [LoginController::class, 'show'])->name('login');
 });
@@ -20,7 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/change-password', [PasswordController::class, 'change'])->name('change-password');
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
-});
+
+    });
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')

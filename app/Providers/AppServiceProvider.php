@@ -9,7 +9,6 @@ use App\Repositories\Auth\AuthRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\VerifyEmailViewResponse;
-
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -26,7 +25,15 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
-    }
+    
+        
+        
+        
+        
+        
+        
+        
+        }
 
     /**
      * Bootstrap any application services.

@@ -10,6 +10,7 @@ class TailwindBladeIndexStubGenerator
     {
         $labelKebab = Str::kebab($label);
         $tableId = lcfirst(str_replace('-', '', ucwords($labelKebab, '-'))).'Table';
+        $tableIdFunction = ucfirst($tableId);
 
         return <<<BLADE
 @extends('layouts.app')
@@ -89,7 +90,7 @@ class TailwindBladeIndexStubGenerator
 
 @push('scripts')
 <script>
-function load{$tableId}() {
+function load{$tableIdFunction}() {
     loadTableData('{$tableId}', '{{ route("ROUTENAME.list") }}', function(item) {
         const row = document.createElement('tr');
         row.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-700';

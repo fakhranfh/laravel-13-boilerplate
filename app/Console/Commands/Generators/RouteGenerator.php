@@ -66,7 +66,7 @@ class RouteGenerator
 
     PHP;
 
-        $pattern = '/Route::middleware\(\s*\[([^\]]*)\]\s*\)->group\(function\s*\(\)\s*{([\s\S]*?)^}\);/m';
+        $pattern = '/Route::middleware\(\s*\[([^\]]*)\]\s*\)->group\(function\s*\(\)\s*{([\s\S]*?)^\s*}\);/m';
         if (preg_match($pattern, $webRouteContent, $matches, PREG_OFFSET_CAPTURE)) {
             $middlewareArray = $matches[1][0];
             $groupBody = $matches[2][0];
@@ -80,19 +80,7 @@ class RouteGenerator
                 } else {
                     $callback("Route for {$name} already exists in routes/web.php. Skipping append.", 'warn');
                 }
-
-                return;
             }
         }
-
-        $middlewareGroup = <<<PHP
-
-Route::middleware(['auth'])->group(function () {
-    Route::resource('{$routeName}', {$name}Controller::class);
-});
-PHP;
-        $newContent = $webRouteContent."\n".$middlewareGroup;
-        $this->filesystem->put($webRoutePath, $newContent);
-        $callback("Route::middleware(['auth'])->group() not found. Created new middleware group with {$name} resource route.", 'info');
     }
 }
