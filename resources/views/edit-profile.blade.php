@@ -43,8 +43,8 @@
 
                 <!-- Profile Photo Section -->
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-space-lg mb-space-xl pb-space-lg border-b border-outline-variant">
-                    <div class="relative group/avatar cursor-pointer flex-shrink-0">
-                        <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-surface-container-low shadow-sm relative">
+                    <div class="relative group/avatar cursor-pointer flex-shrink-0" onclick="document.getElementById('profile_photo').click()">
+                        <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-surface-container-low shadow-sm relative hover:shadow-lg transition-shadow">
                             @php
                                 $userInitial = strtoupper(substr(auth()->user()->name, 0, 1));
                                 $defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%231E3A8A%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2250%22 font-weight=%22bold%22%3E' . $userInitial . '%3C/text%3E%3C/svg%3E';
@@ -54,9 +54,6 @@
                                 <span class="material-symbols-outlined text-surface text-[32px]">photo_camera</span>
                             </div>
                         </div>
-                        <button id="upload-trigger" type="button" class="absolute bottom-0 right-0 bg-surface border border-outline-variant rounded-full p-space-xs shadow-sm text-secondary hover:text-primary hover:border-primary transition-colors cursor-pointer" onclick="document.getElementById('profile_photo').click()">
-                            <span class="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
                     </div>
 
                     <div class="text-center md:text-left flex flex-col justify-center flex-1">
