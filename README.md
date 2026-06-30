@@ -108,13 +108,24 @@ php artisan make:rsc Product --label="Products"
 - RESTful routes
 - Sidebar menu item
 
+#### Generated Output
+
+| Index | Create |
+|---|---|
+| ![Product Index](docs/dusk/images/crud/product-index.png) | ![Product Create](docs/dusk/images/crud/product-create.png) |
+
+| Show | Edit |
+|---|---|
+| ![Product Show](docs/dusk/images/crud/product-show.png) | ![Product Edit](docs/dusk/images/crud/product-edit.png) |
+
 To delete a generated module:
 
 ```bash
 php artisan delete:rsc Product
 ```
 
-> Full guide including column configuration and interactive prompts: [`docs/CRUD_GENERATOR.md`](docs/CRUD_GENERATOR.md)
+> Visual showcase with architecture diagrams: [`docs/CRUD_GENERATOR_SHOWCASE.md`](docs/CRUD_GENERATOR_SHOWCASE.md)  
+> Full command reference with column configuration: [`docs/CRUD_GENERATOR.md`](docs/CRUD_GENERATOR.md)
 
 ---
 
@@ -246,6 +257,7 @@ QUEUE_CONNECTION=database
 |---|---|
 | [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | **Complete setup and development guide (start here)** |
 | [`docs/USERGUIDE.md`](docs/USERGUIDE.md) | End-user feature walkthrough with screenshots |
+| [`docs/CRUD_GENERATOR_SHOWCASE.md`](docs/CRUD_GENERATOR_SHOWCASE.md) | `make:rsc` generated output — screenshots and architecture |
 | [`docs/CRUD_GENERATOR.md`](docs/CRUD_GENERATOR.md) | `make:rsc` command — full reference |
 | [`docs/REPOSITORY_PATTERN.md`](docs/REPOSITORY_PATTERN.md) | Architecture guide for the repository layer |
 | [`docs/DATATABLE_INTEGRATION.md`](docs/DATATABLE_INTEGRATION.md) | DataTables server-side integration |

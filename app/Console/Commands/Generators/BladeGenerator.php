@@ -33,6 +33,7 @@ class BladeGenerator
     public function generate(string $name, string $label, string $viewPath = 'app', array $columnInputTypes = [], ?callable $callback = null): void
     {
         $kebabCaseName = Str::kebab($name);
+        $routeName = Str::kebab($label);
         $bladeDir = resource_path("views/{$viewPath}/{$kebabCaseName}");
 
         $indexBladePath = "{$bladeDir}/index.blade.php";
@@ -44,7 +45,7 @@ class BladeGenerator
 
         // Generate Index Blade
         $indexContent = $this->indexStubGenerator->generate($name, $label);
-        $indexContent = str_replace(['LABEL', 'ROUTENAME'], [$label, Str::kebab($name)], $indexContent);
+        $indexContent = str_replace(['LABEL', 'ROUTENAME'], [$label, $routeName], $indexContent);
 
         if (! $this->filesystem->exists($indexBladePath)) {
             $this->filesystem->put($indexBladePath, $indexContent);
@@ -59,7 +60,7 @@ class BladeGenerator
 
         // Generate Create Blade
         $createContent = $this->createStubGenerator->generate($name, $label, $columnInputTypes);
-        $createContent = str_replace(['LABEL', 'ROUTENAME'], [$label, Str::kebab($name)], $createContent);
+        $createContent = str_replace(['LABEL', 'ROUTENAME'], [$label, $routeName], $createContent);
 
         if (! $this->filesystem->exists($createBladePath)) {
             $this->filesystem->put($createBladePath, $createContent);
@@ -74,7 +75,7 @@ class BladeGenerator
 
         // Generate Edit Blade
         $editContent = $this->editStubGenerator->generate($name, $label, $columnInputTypes);
-        $editContent = str_replace(['LABEL', 'ROUTENAME'], [$label, Str::kebab($name)], $editContent);
+        $editContent = str_replace(['LABEL', 'ROUTENAME'], [$label, $routeName], $editContent);
 
         if (! $this->filesystem->exists($editBladePath)) {
             $this->filesystem->put($editBladePath, $editContent);
@@ -89,7 +90,7 @@ class BladeGenerator
 
         // Generate Show Blade
         $showContent = $this->showStubGenerator->generate($name, $label);
-        $showContent = str_replace(['LABEL', 'ROUTENAME'], [$label, Str::kebab($name)], $showContent);
+        $showContent = str_replace(['LABEL', 'ROUTENAME'], [$label, $routeName], $showContent);
 
         if (! $this->filesystem->exists($showBladePath)) {
             $this->filesystem->put($showBladePath, $showContent);
@@ -104,7 +105,7 @@ class BladeGenerator
 
         // Add sidebar button
         if (is_callable($callback)) {
-            $this->addSidebarItem($kebabCaseName, $label, $callback);
+            $this->addSidebarItem($routeName, $label, $callback);
         }
     }
 
