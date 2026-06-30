@@ -111,43 +111,35 @@ class BladeGenerator
 
     private function addSidebarItem(string $routeName, string $label, callable $callback): void
     {
-        $sidebarPath = resource_path('views/components/sidebar.blade.php');
+        $configPath = config_path('sidebar.php');
 
-        if (! $this->filesystem->exists($sidebarPath)) {
-            $callback("Sidebar component not found: {$sidebarPath}", 'error');
+        if (! $this->filesystem->exists($configPath)) {
+            $callback("Sidebar config not found: {$configPath}", 'error');
 
             return;
         }
 
-        $sidebarContent = $this->filesystem->get($sidebarPath);
+        $configContent = $this->filesystem->get($configPath);
 
-        // Create the new sidebar item
-        $icon = $this->getIconForRoute($routeName);
-        $sidebarItem = <<<BLADE
-            <!-- {$label} -->
-            <li>
-                <a href="{{ route('{$routeName}.index') }}" class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-black hover:bg-primary/10 transition-colors duration-150 {{ request()->routeIs('{$routeName}.*') ? 'bg-primary/20 text-primary' : 'hover:text-on-surface' }}">
-                    <span class="material-symbols-outlined text-[24px]">{$icon}</span>
-                    <span class="font-body-md text-body-md">{$label}</span>
-                </a>
-            </li>
-            BLADE;
-
-        // Check if the route is already in sidebar
-        if (strpos($sidebarContent, "route('{$routeName}.index')") !== false) {
+        if (str_contains($configContent, "'{$routeName}.index'")) {
             $callback("Sidebar item for '{$label}' already exists", 'warn');
 
             return;
         }
 
-        // Find the closing </ul> tag and insert before it
-        $updatedContent = str_replace(
-            '        </ul>',
-            $sidebarItem."\n        </ul>",
-            $sidebarContent
-        );
+        $icon = $this->getIconForRoute($routeName);
+        $newItem = <<<PHP
+            [
+                'label' => '{$label}',
+                'route' => '{$routeName}.index',
+                'icon' => '{$icon}',
+                'active_pattern' => '{$routeName}.*',
+            ],
+        PHP;
 
-        $this->filesystem->put($sidebarPath, $updatedContent);
+        $updatedContent = str_replace('];', "{$newItem}\n];", $configContent);
+
+        $this->filesystem->put($configPath, $updatedContent);
         $callback("Sidebar item added for '{$label}'", 'info');
     }
 

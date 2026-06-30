@@ -3,20 +3,14 @@
     <!-- Navigation Menu -->
     <nav class="flex-1 overflow-y-auto py-space-md px-space-md">
         <ul class="space-y-space-xs">
-            <!-- Dashboard -->
-            <li>
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-black hover:bg-primary/10 transition-colors duration-150 {{ request()->routeIs('dashboard') ? 'bg-primary/20 text-primary' : 'hover:text-on-surface' }}">
-                    <span class="material-symbols-outlined text-[24px]">dashboard</span>
-                    <span class="font-body-md text-body-md">Dashboard</span>
-                </a>
-            </li>
-<!-- Product -->
-<li>
-    <a href="{{ route('products.index') }}" class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-black hover:bg-primary/10 transition-colors duration-150 {{ request()->routeIs('products.*') ? 'bg-primary/20 text-primary' : 'hover:text-on-surface' }}">
-        <span class="material-symbols-outlined text-[24px]">shopping_cart</span>
-        <span class="font-body-md text-body-md">Product</span>
-    </a>
-</li>
+            @foreach (config('sidebar') as $item)
+                <li>
+                    <a href="{{ route($item['route']) }}" class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-black hover:bg-primary/10 transition-colors duration-150 {{ request()->routeIs($item['active_pattern']) ? 'bg-primary/20 text-primary' : 'hover:text-on-surface' }}">
+                        <span class="material-symbols-outlined text-[24px]">{{ $item['icon'] }}</span>
+                        <span class="font-body-md text-body-md">{{ $item['label'] }}</span>
+                    </a>
+                </li>
+            @endforeach
         </ul>
     </nav>
 </aside>
