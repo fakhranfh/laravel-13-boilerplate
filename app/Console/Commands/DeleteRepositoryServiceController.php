@@ -168,7 +168,7 @@ class DeleteRepositoryServiceController extends Command
 
     private function removeFromSidebar(string $routeName): void
     {
-        $sidebarPath = resource_path('views/components/sidebar.blade.php');
+        $sidebarPath = config_path('sidebar.php');
 
         if (! File::exists($sidebarPath)) {
             return;
@@ -176,14 +176,13 @@ class DeleteRepositoryServiceController extends Command
 
         $content = File::get($sidebarPath);
 
-        // Remove sidebar item with comment and associated <li> block
-        // More flexible pattern to handle various whitespace and formatting
-        $pattern = '/\\s*<!--[^-]*'.preg_quote($routeName).'[^-]*-->\\s*\\n\\s*<li>[\\s\\S]*?route\\([\'"]'.preg_quote($routeName).'(\\.\\w+)?[\'"][\\s\\S]*?<\\/li>\\s*\\n/i';
+        // Remove the array entry block whose 'route' value matches routeName.index
+        $pattern = '/\n\s*\[\n[^\]]*?\'route\'\s*=>\s*\''.preg_quote($routeName, '/').'\.index\'[^\]]*?\],?/s';
         $updated = preg_replace($pattern, '', $content);
 
         if ($updated !== $content) {
             File::put($sidebarPath, $updated);
-            $this->info("✓ Removed sidebar item for '{$routeName}'");
+            $this->info("✓ Removed sidebar entry for '{$routeName}'");
         }
     }
 }
