@@ -59,7 +59,7 @@ class BladeGenerator
         }
 
         // Generate Create Blade
-        $createContent = $this->createStubGenerator->generate($name, $label, $columnInputTypes);
+        $createContent = $this->createStubGenerator->generate($name, $label, $columnInputTypes, $filterDefinitions);
         $createContent = str_replace(['LABEL', 'ROUTENAME'], [$label, $routeName], $createContent);
 
         if (! $this->filesystem->exists($createBladePath)) {
@@ -74,7 +74,7 @@ class BladeGenerator
         }
 
         // Generate Edit Blade
-        $editContent = $this->editStubGenerator->generate($name, $label, $columnInputTypes);
+        $editContent = $this->editStubGenerator->generate($name, $label, $columnInputTypes, $filterDefinitions);
         $editContent = str_replace(['LABEL', 'ROUTENAME'], [$label, $routeName], $editContent);
 
         if (! $this->filesystem->exists($editBladePath)) {

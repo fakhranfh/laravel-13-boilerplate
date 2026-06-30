@@ -73,6 +73,8 @@ PHP;
 
             if ($filter['type'] === 'text') {
                 $lines[] = "        if (! empty(\$filters['{$key}'])) {\n            \$query->where('{$dbColumn}', 'like', '%'.\$filters['{$key}'].'%');\n        }";
+            } elseif ($filter['type'] === 'enum') {
+                $lines[] = "        if (! empty(\$filters['{$key}'])) {\n            \$query->where('{$dbColumn}', \$filters['{$key}']);\n        }";
             } elseif ($filter['type'] === 'datetime') {
                 $lines[] = "        if (! empty(\$filters['{$key}_from'])) {\n            \$query->whereDate('{$dbColumn}', '>=', \$filters['{$key}_from']);\n        }";
                 $lines[] = "        if (! empty(\$filters['{$key}_to'])) {\n            \$query->whereDate('{$dbColumn}', '<=', \$filters['{$key}_to']);\n        }";

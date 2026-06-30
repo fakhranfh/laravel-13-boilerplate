@@ -7,8 +7,15 @@ use Illuminate\Support\Str;
 
 class TailwindBladeCreateStubGenerator
 {
-    public function generate(string $name, string $label, array $columnInputTypes = []): string
+    public function generate(string $name, string $label, array $columnInputTypes = [], array $filterDefinitions = []): string
     {
+        $enumOptions = [];
+        foreach ($filterDefinitions as $filter) {
+            if ($filter['type'] === 'enum' && isset($filter['options'])) {
+                $enumOptions[$filter['key']] = $filter['options'];
+            }
+        }
+
         $labelKebab = Str::kebab($label);
 
         // Get columns from database or columnInputTypes
@@ -124,7 +131,7 @@ HTML;
                         'tel' => $this->generateTelField($col),
                         'checkbox' => $this->generateCheckboxField($col),
                         'radio' => $this->generateBooleanField($col),
-                        'select' => $this->generateSelectField($col),
+                        'select' => $this->generateSelectField($col, $enumOptions[$col] ?? []),
                         default => $this->generateTextField($col),
                     };
                 } else {
@@ -343,12 +350,17 @@ HTML;
 HTML;
     }
 
-    private function generateSelectField(string $col): string
+    private function generateSelectField(string $col, array $options = []): string
     {
+        $optionLines = '';
+        foreach ($options as $value => $label) {
+            $optionLines .= "\n            <option value=\"{$value}\" {{ old('{$col}', isset(\$item) ? \$item->{$col} : '') === '{$value}' ? 'selected' : '' }}>@lang('{$label}')</option>";
+        }
+
         return <<<HTML
 <select id="$col" name="$col" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required @if(isset(\$isView)) disabled @endif>
-  <option value="">-- @lang('Select') --</option>
-</select>
+            <option value="">-- @lang('Select') --</option>{$optionLines}
+          </select>
 HTML;
     }
 }

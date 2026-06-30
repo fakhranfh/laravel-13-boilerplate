@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 
 Route::middleware('guest')->group(function () {
     Route::get('', function () {
@@ -17,7 +18,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/change-password', 'change-password')->name('change-password');
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
-});
+
+    Route::get('product/data/list', [ProductController::class, 'list'])->name('product.list');
+    Route::resource('product', ProductController::class);
+
+    });
 
 Route::post('/logout', function (Request $request) {
     auth()->logout();

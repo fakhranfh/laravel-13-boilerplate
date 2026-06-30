@@ -7,6 +7,8 @@ use App\Http\Responses\CustomVerifyEmailViewResponse;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\VerifyEmailViewResponse;
+use App\Repositories\Product\ProductRepositoryInterface;
+use App\Repositories\Product\ProductRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,7 +25,8 @@ class AppServiceProvider extends ServiceProvider
             return new CustomAuthenticatedSessionResponse;
         });
 
-        }
+        
+        $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);}
 
     /**
      * Bootstrap any application services.

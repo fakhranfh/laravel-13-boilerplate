@@ -12,6 +12,8 @@ class TailwindBladeIndexStubGenerator
         $tableId = lcfirst(str_replace('-', '', ucwords($labelKebab, '-'))).'Table';
         $tableIdFunction = ucfirst($tableId);
         $filtersArray = $this->buildFiltersArray($filterDefinitions);
+        $tableHeaders = $this->buildTableHeaders($filterDefinitions);
+        $tableRows = $this->buildTableRows($filterDefinitions);
 
         return <<<BLADE
 @extends('layouts.app')
@@ -64,8 +66,7 @@ class TailwindBladeIndexStubGenerator
             ]">
             <x-slot name="headers">
                 <th class="px-6 py-3 text-left font-semibold">{{ __('ID') }}</th>
-                <th class="px-6 py-3 text-left font-semibold">{{ __('Name') }}</th>
-                <th class="px-6 py-3 text-left font-semibold">{{ __('Created') }}</th>
+{$tableHeaders}
                 <th class="px-6 py-3 text-right font-semibold">{{ __('Actions') }}</th>
             </x-slot>
         </x-data-table>
@@ -100,8 +101,7 @@ function load{$tableIdFunction}() {
         row.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-700';
         row.innerHTML = `
             <td class="px-6 py-3">\${item.id}</td>
-            <td class="px-6 py-3">\${item.name}</td>
-            <td class="px-6 py-3">\${item.created_at}</td>
+{$tableRows}
             <td class="px-6 py-3 text-right">
                 <div class="flex gap-2 justify-end">
                     <a href="\${item.actions.show}" class="text-blue-600 hover:text-blue-900 text-sm font-medium">{{ __('View') }}</a>
@@ -119,12 +119,53 @@ function load{$tableIdFunction}() {
 BLADE;
     }
 
+    private function buildTableHeaders(array $filterDefinitions): string
+    {
+        $lines = [];
+
+        foreach ($filterDefinitions as $filter) {
+            if ($filter['key'] === 'created' && $filter['type'] === 'datetime') {
+                $lines[] = "                <th class=\"px-6 py-3 text-left font-semibold\">{{ __('{$filter['label']}') }}</th>";
+            } elseif ($filter['type'] !== 'datetime') {
+                $lines[] = "                <th class=\"px-6 py-3 text-left font-semibold\">{{ __('{$filter['label']}') }}</th>";
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function buildTableRows(array $filterDefinitions): string
+    {
+        $lines = [];
+
+        foreach ($filterDefinitions as $filter) {
+            if ($filter['key'] === 'created' && $filter['type'] === 'datetime') {
+                $lines[] = '            <td class="px-6 py-3">${item.created_at}</td>';
+            } elseif ($filter['type'] === 'datetime') {
+                $lines[] = "            <td class=\"px-6 py-3\">\${item.{$filter['key']}}</td>";
+            } else {
+                $lines[] = "            <td class=\"px-6 py-3\">\${item.{$filter['key']}}</td>";
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+
     private function buildFiltersArray(array $filterDefinitions): string
     {
         $lines = [];
 
         foreach ($filterDefinitions as $filter) {
-            $lines[] = "                ['key' => '{$filter['key']}', 'label' => '{$filter['label']}', 'type' => '{$filter['type']}'],";
+            if ($filter['type'] === 'enum') {
+                $optionsParts = [];
+                foreach ($filter['options'] as $value => $label) {
+                    $optionsParts[] = "'{$value}' => '{$label}'";
+                }
+                $optionsInline = implode(', ', $optionsParts);
+                $lines[] = "                ['key' => '{$filter['key']}', 'label' => '{$filter['label']}', 'type' => 'enum', 'options' => [{$optionsInline}]],";
+            } else {
+                $lines[] = "                ['key' => '{$filter['key']}', 'label' => '{$filter['label']}', 'type' => '{$filter['type']}'],";
+            }
         }
 
         return implode("\n", $lines);

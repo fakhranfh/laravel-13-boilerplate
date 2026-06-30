@@ -167,6 +167,21 @@ class MakeRepositoryServiceController extends Command
 
         if (! empty($this->columns)) {
             foreach ($this->columns as $col) {
+                if ($col['type'] === 'enum') {
+                    $options = array_combine($col['values'], array_map(
+                        fn ($v) => Str::title(str_replace('_', ' ', $v)),
+                        $col['values']
+                    ));
+                    $filters[] = [
+                        'key' => $col['name'],
+                        'label' => Str::title(str_replace('_', ' ', $col['name'])),
+                        'type' => 'enum',
+                        'options' => $options,
+                    ];
+
+                    continue;
+                }
+
                 $filterType = match ($col['type']) {
                     'string', 'text', 'longText', 'integer', 'bigInteger', 'smallInteger', 'decimal', 'float' => 'text',
                     'date', 'dateTime', 'timestamp' => 'datetime',

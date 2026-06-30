@@ -16,6 +16,21 @@
                             placeholder="{{ __('Search') }} {{ __($filter['label']) }}..."
                             class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
+                @elseif ($filter['type'] === 'enum')
+                    <div class="flex-1 min-w-[160px]">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            {{ __($filter['label']) }}
+                        </label>
+                        <select
+                            data-filter-table="{{ $tableId }}"
+                            data-filter-key="{{ $filter['key'] }}"
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">{{ __('All') }}</option>
+                            @foreach ($filter['options'] as $value => $label)
+                                <option value="{{ $value }}">{{ __($label) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 @elseif ($filter['type'] === 'datetime')
                     <div class="min-w-[160px]">
                         <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">

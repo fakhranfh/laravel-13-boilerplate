@@ -24,6 +24,7 @@ class ControllerStubGenerator
         $foreignServiceAssignments = $this->generateForeignServiceAssignments($name, $foreignKeys);
         $foreignDataMethod = $this->generateForeignDataMethod($name, $foreignKeys);
         $filterOnlyKeys = $this->buildFilterOnlyKeys($filterDefinitions);
+        $jsonFields = $this->buildJsonFields($filterDefinitions);
 
         return <<<PHP
 <?php
@@ -66,8 +67,7 @@ class {$name}Controller extends Controller
         return response()->json([
             'data' => \$items->map(fn(\$item) => [
                 'id' => \$item->id ?? '',
-                'name' => \$item->name ?? \$item->title ?? '',
-                'created_at' => \$item->created_at?->format('Y-m-d H:i:s') ?? '',
+{$jsonFields}
                 'actions' => [
                     'show' => route('{$labelKebab}.show', \$item->id),
                     'edit' => route('{$labelKebab}.edit', \$item->id),
@@ -275,12 +275,29 @@ PHP;
         return $assignments;
     }
 
+    private function buildJsonFields(array $filterDefinitions): string
+    {
+        $lines = [];
+
+        foreach ($filterDefinitions as $filter) {
+            if ($filter['key'] === 'created' && $filter['type'] === 'datetime') {
+                $lines[] = "                'created_at' => \$item->created_at?->format('Y-m-d H:i:s') ?? '',";
+            } elseif ($filter['type'] === 'datetime') {
+                $lines[] = "                '{$filter['key']}' => \$item->{$filter['key']}?->format('Y-m-d H:i:s') ?? '',";
+            } else {
+                $lines[] = "                '{$filter['key']}' => \$item->{$filter['key']} ?? '',";
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+
     private function buildFilterOnlyKeys(array $filterDefinitions): string
     {
         $keys = [];
 
         foreach ($filterDefinitions as $filter) {
-            if ($filter['type'] === 'text') {
+            if ($filter['type'] === 'text' || $filter['type'] === 'enum') {
                 $keys[] = "'{$filter['key']}'";
             } elseif ($filter['type'] === 'datetime') {
                 $keys[] = "'{$filter['key']}_from'";
