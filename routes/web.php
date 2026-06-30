@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,9 +17,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/change-password', 'change-password')->name('change-password');
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
-
-    Route::get('products/data/list', [ProductController::class, 'list'])->name('products.list');
-    Route::resource('products', ProductController::class);
 });
 
 Route::post('/logout', function (Request $request) {
