@@ -1,31 +1,33 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LandingPageController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\PasswordController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProductController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('', [LoginController::class, 'show'])->name('login');
+    Route::get('', function () {
+        return view('auth.login');
+    })->name('login');
 });
 
-Route::get('/', [LandingPageController::class, 'show']);
+Route::view('/', 'landing-page');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/edit-profile', [ProfileController::class, 'edit'])->name('edit-profile');
-    Route::post('/edit-profile', [ProfileController::class, 'update']);
-    Route::get('/verify-email-change', [ProfileController::class, 'verifyEmailChange'])->name('profile.verify-email-change');
+    Route::view('/edit-profile', 'edit-profile')->name('edit-profile');
 
-    Route::get('/change-password', [PasswordController::class, 'change'])->name('change-password');
-    Route::put('/user-password', [PasswordController::class, 'update'])->name('user-password.update');
+    Route::view('/change-password', 'change-password')->name('change-password');
 
-    Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
+    Route::view('/dashboard', 'dashboard')->name('dashboard');
 
+    Route::get('products/data/list', [ProductController::class, 'list'])->name('products.list');
+    Route::resource('products', ProductController::class);
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth')
-    ->name('logout');
+Route::post('/logout', function (Request $request) {
+    auth()->logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('login');
+})->middleware('auth')->name('logout');
