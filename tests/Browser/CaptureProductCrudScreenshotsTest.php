@@ -24,7 +24,7 @@ test('capture product index page screenshot', function () {
     $this->browse(function (Browser $browser) use ($user) {
         $browser->loginAs($user)
             ->visit('/products')
-            ->pause(4000)
+            ->pause(1500)
             ->screenshot('product-index');
     });
 });

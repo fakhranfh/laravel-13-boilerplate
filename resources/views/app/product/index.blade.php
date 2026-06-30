@@ -60,6 +60,24 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @forelse($items as $item)
+                            <tr>
+                                <td class="px-6 py-4">{{ $item->id }}</td>
+                                <td class="px-6 py-4">{{ $item->name }}</td>
+                                <td class="px-6 py-4">{{ $item->created_at?->format('Y-m-d H:i:s') }}</td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex gap-2 justify-end">
+                                        <a href="{{ route('products.show', $item->id) }}" class="text-blue-600 hover:text-blue-900 text-sm font-medium">{{ __('View') }}</a>
+                                        <a href="{{ route('products.edit', $item->id) }}" class="text-amber-600 hover:text-amber-900 text-sm font-medium">{{ __('Edit') }}</a>
+                                        <button onclick="deleteItem('{{ route('products.destroy', $item->id) }}')" class="text-red-600 hover:text-red-900 text-sm font-medium">{{ __('Delete') }}</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">{{ __('No data available') }}</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
