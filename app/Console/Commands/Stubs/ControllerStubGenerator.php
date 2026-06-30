@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class ControllerStubGenerator
 {
-    public function generate(string $name, string $label, string $viewPath = 'app'): string
+    public function generate(string $name, string $label, string $viewPath = 'app', array $filterDefinitions = []): string
     {
         $kebabCaseName = Str::kebab($name);
         $camelCaseName = Str::camel($name);
@@ -23,6 +23,7 @@ class ControllerStubGenerator
         $foreignConstructorParams = $this->generateForeignConstructorParams($name, $foreignKeys);
         $foreignServiceAssignments = $this->generateForeignServiceAssignments($name, $foreignKeys);
         $foreignDataMethod = $this->generateForeignDataMethod($name, $foreignKeys);
+        $filterOnlyKeys = $this->buildFilterOnlyKeys($filterDefinitions);
 
         return <<<PHP
 <?php
@@ -59,7 +60,8 @@ class {$name}Controller extends Controller
 
     public function list(Request \$request)
     {
-        \$items = \$this->{$camelCaseName}Service->getAll();
+        \$filters = \$request->only([{$filterOnlyKeys}]);
+        \$items = \$this->{$camelCaseName}Service->get(\$filters);
 
         return response()->json([
             'data' => \$items->map(fn(\$item) => [
@@ -271,6 +273,22 @@ PHP;
         }
 
         return $assignments;
+    }
+
+    private function buildFilterOnlyKeys(array $filterDefinitions): string
+    {
+        $keys = [];
+
+        foreach ($filterDefinitions as $filter) {
+            if ($filter['type'] === 'text') {
+                $keys[] = "'{$filter['key']}'";
+            } elseif ($filter['type'] === 'datetime') {
+                $keys[] = "'{$filter['key']}_from'";
+                $keys[] = "'{$filter['key']}_to'";
+            }
+        }
+
+        return implode(', ', $keys);
     }
 
     private function generateForeignDataMethod(string $name, array $foreignKeys): string

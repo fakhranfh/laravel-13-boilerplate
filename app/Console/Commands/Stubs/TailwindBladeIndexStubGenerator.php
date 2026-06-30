@@ -6,11 +6,12 @@ use Illuminate\Support\Str;
 
 class TailwindBladeIndexStubGenerator
 {
-    public function generate(string $name, string $label): string
+    public function generate(string $name, string $label, array $filterDefinitions = []): string
     {
         $labelKebab = Str::kebab($label);
         $tableId = lcfirst(str_replace('-', '', ucwords($labelKebab, '-'))).'Table';
         $tableIdFunction = ucfirst($tableId);
+        $filtersArray = $this->buildFiltersArray($filterDefinitions);
 
         return <<<BLADE
 @extends('layouts.app')
@@ -57,7 +58,10 @@ class TailwindBladeIndexStubGenerator
         <x-data-table
             title="{{ __('All LABEL') }}"
             tableId="{$tableId}"
-            listUrl="{{ route('ROUTENAME.list') }}">
+            listUrl="{{ route('ROUTENAME.list') }}"
+            :filters="[
+{$filtersArray}
+            ]">
             <x-slot name="headers">
                 <th class="px-6 py-3 text-left font-semibold">{{ __('ID') }}</th>
                 <th class="px-6 py-3 text-left font-semibold">{{ __('Name') }}</th>
@@ -91,7 +95,7 @@ class TailwindBladeIndexStubGenerator
 @push('scripts')
 <script>
 function load{$tableIdFunction}() {
-    loadTableData('{$tableId}', '{{ route("ROUTENAME.list") }}', function(item) {
+    loadTableData('{$tableId}', buildFilterUrl('{$tableId}'), function(item) {
         const row = document.createElement('tr');
         row.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-700';
         row.innerHTML = `
@@ -113,5 +117,16 @@ function load{$tableIdFunction}() {
 @endpush
 @endsection
 BLADE;
+    }
+
+    private function buildFiltersArray(array $filterDefinitions): string
+    {
+        $lines = [];
+
+        foreach ($filterDefinitions as $filter) {
+            $lines[] = "                ['key' => '{$filter['key']}', 'label' => '{$filter['label']}', 'type' => '{$filter['type']}'],";
+        }
+
+        return implode("\n", $lines);
     }
 }

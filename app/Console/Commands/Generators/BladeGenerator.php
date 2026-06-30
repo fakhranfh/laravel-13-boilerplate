@@ -30,7 +30,7 @@ class BladeGenerator
         $this->showStubGenerator = new TailwindBladeShowStubGenerator;
     }
 
-    public function generate(string $name, string $label, string $viewPath = 'app', array $columnInputTypes = [], ?callable $callback = null): void
+    public function generate(string $name, string $label, string $viewPath = 'app', array $columnInputTypes = [], array $filterDefinitions = [], ?callable $callback = null): void
     {
         $kebabCaseName = Str::kebab($name);
         $routeName = Str::kebab($label);
@@ -44,7 +44,7 @@ class BladeGenerator
         $this->filesystem->ensureDirectoryExists($bladeDir);
 
         // Generate Index Blade
-        $indexContent = $this->indexStubGenerator->generate($name, $label);
+        $indexContent = $this->indexStubGenerator->generate($name, $label, $filterDefinitions);
         $indexContent = str_replace(['LABEL', 'ROUTENAME'], [$label, $routeName], $indexContent);
 
         if (! $this->filesystem->exists($indexBladePath)) {

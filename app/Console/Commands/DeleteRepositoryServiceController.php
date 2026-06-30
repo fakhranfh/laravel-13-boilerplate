@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -96,6 +97,8 @@ class DeleteRepositoryServiceController extends Command
 
         // Remove sidebar item
         $this->removeFromSidebar($kebabName);
+
+        Artisan::call('optimize');
 
         if ($deleted) {
             $this->info('All files have been deleted successfully.');

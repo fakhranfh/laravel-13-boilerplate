@@ -17,14 +17,14 @@ class ControllerGenerator
         $this->stubGenerator = new ControllerStubGenerator;
     }
 
-    public function generate(string $name, string $label, string $viewPath = 'app', ?callable $callback = null): void
+    public function generate(string $name, string $label, string $viewPath = 'app', array $filterDefinitions = [], ?callable $callback = null): void
     {
         $controllerPath = app_path("Http/Controllers/{$name}Controller.php");
 
         $this->filesystem->ensureDirectoryExists(app_path('Http/Controllers'));
 
         if (! $this->filesystem->exists($controllerPath)) {
-            $content = $this->stubGenerator->generate($name, $label, $viewPath);
+            $content = $this->stubGenerator->generate($name, $label, $viewPath, $filterDefinitions);
             $this->filesystem->put($controllerPath, $content);
             if (is_callable($callback)) {
                 $callback("Controller created: {$controllerPath}", 'info');

@@ -4,8 +4,10 @@ namespace App\Console\Commands\Stubs;
 
 class RepositoryStubGenerator
 {
-    public function generate(string $name): string
+    public function generate(string $name, array $filterDefinitions = []): string
     {
+        $filterConditions = $this->buildFilterConditions($filterDefinitions);
+
         return <<<PHP
 <?php
 
@@ -19,13 +21,7 @@ class {$name}Repository implements {$name}RepositoryInterface
     {
         \$query = {$name}::query();
 
-        foreach (\$filters as \$key => \$value) {
-            if (is_null(\$value) || \$value === '') {
-                continue;
-            }
-
-            \$query->where(\$key, \$value);
-        }
+{$filterConditions}
 
         return \$query;
     }
@@ -65,5 +61,24 @@ class {$name}Repository implements {$name}RepositoryInterface
     }
 }
 PHP;
+    }
+
+    private function buildFilterConditions(array $filterDefinitions): string
+    {
+        $lines = [];
+
+        foreach ($filterDefinitions as $filter) {
+            $key = $filter['key'];
+            $dbColumn = $key === 'created' ? 'created_at' : $key;
+
+            if ($filter['type'] === 'text') {
+                $lines[] = "        if (! empty(\$filters['{$key}'])) {\n            \$query->where('{$dbColumn}', 'like', '%'.\$filters['{$key}'].'%');\n        }";
+            } elseif ($filter['type'] === 'datetime') {
+                $lines[] = "        if (! empty(\$filters['{$key}_from'])) {\n            \$query->whereDate('{$dbColumn}', '>=', \$filters['{$key}_from']);\n        }";
+                $lines[] = "        if (! empty(\$filters['{$key}_to'])) {\n            \$query->whereDate('{$dbColumn}', '<=', \$filters['{$key}_to']);\n        }";
+            }
+        }
+
+        return implode("\n\n", $lines);
     }
 }

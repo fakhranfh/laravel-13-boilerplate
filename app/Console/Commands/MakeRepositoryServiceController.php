@@ -29,6 +29,8 @@ class MakeRepositoryServiceController extends Command
 
     private array $columns = [];
 
+    private array $filterDefinitions = [];
+
     public function handle(): int
     {
         try {
@@ -45,7 +47,6 @@ class MakeRepositoryServiceController extends Command
 
             $this->generateModel($name, $this->columns);
 
-            $this->generateRepository($name);
             $this->generateService($name, $label);
             $this->bindToServiceProvider($name);
 
@@ -53,7 +54,6 @@ class MakeRepositoryServiceController extends Command
                 return 0;
             }
 
-            $this->generateController($name, $label, $viewPath);
             $this->generateFormRequests($name);
 
             // Configure form input types if not already done via migration
@@ -61,6 +61,11 @@ class MakeRepositoryServiceController extends Command
                 $this->configureFormInputTypes($name);
             }
 
+            // Build filter definitions after all column info is available
+            $this->filterDefinitions = $this->buildFilterDefinitions();
+
+            $this->generateRepository($name);
+            $this->generateController($name, $label, $viewPath);
             $this->generateBladeViews($name, $label, $viewPath);
             $this->generateRoutes($name, $label);
 
@@ -97,7 +102,7 @@ class MakeRepositoryServiceController extends Command
     private function generateRepository(string $name): void
     {
         $generator = new RepositoryGenerator;
-        $generator->generate($name, function (string $message, string $type) {
+        $generator->generate($name, $this->filterDefinitions, function (string $message, string $type) {
             $this->$type($message);
         });
     }
@@ -114,7 +119,7 @@ class MakeRepositoryServiceController extends Command
     {
         try {
             $generator = new ControllerGenerator;
-            $generator->generate($name, $label, $viewPath, function (string $message, string $type) {
+            $generator->generate($name, $label, $viewPath, $this->filterDefinitions, function (string $message, string $type) {
                 $this->$type($message);
             });
             $this->info("✓ Controller with DataTables list() method generated for {$name}");
@@ -151,9 +156,52 @@ class MakeRepositoryServiceController extends Command
     private function generateBladeViews(string $name, string $label, string $viewPath): void
     {
         $generator = new BladeGenerator;
-        $generator->generate($name, $label, $viewPath, $this->columnInputTypes, function (string $message, string $type) {
+        $generator->generate($name, $label, $viewPath, $this->columnInputTypes, $this->filterDefinitions, function (string $message, string $type) {
             $this->$type($message);
         });
+    }
+
+    private function buildFilterDefinitions(): array
+    {
+        $filters = [];
+
+        if (! empty($this->columns)) {
+            foreach ($this->columns as $col) {
+                $filterType = match ($col['type']) {
+                    'string', 'text', 'longText', 'integer', 'bigInteger', 'smallInteger', 'decimal', 'float' => 'text',
+                    'date', 'dateTime', 'timestamp' => 'datetime',
+                    default => null,
+                };
+
+                if ($filterType !== null) {
+                    $filters[] = [
+                        'key' => $col['name'],
+                        'label' => Str::title(str_replace('_', ' ', $col['name'])),
+                        'type' => $filterType,
+                    ];
+                }
+            }
+        } elseif (! empty($this->columnInputTypes)) {
+            foreach ($this->columnInputTypes as $colName => $inputType) {
+                $filterType = match ($inputType) {
+                    'text', 'email', 'url', 'tel', 'number', 'textarea' => 'text',
+                    'date', 'datetime-local' => 'datetime',
+                    default => null,
+                };
+
+                if ($filterType !== null) {
+                    $filters[] = [
+                        'key' => $colName,
+                        'label' => Str::title(str_replace('_', ' ', $colName)),
+                        'type' => $filterType,
+                    ];
+                }
+            }
+        }
+
+        $filters[] = ['key' => 'created', 'label' => 'Created', 'type' => 'datetime'];
+
+        return $filters;
     }
 
     private function generateMigration(string $name): void

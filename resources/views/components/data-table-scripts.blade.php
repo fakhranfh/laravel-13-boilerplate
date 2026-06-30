@@ -31,6 +31,37 @@ function loadTableData(tableId, listUrl, renderCallback) {
         });
 }
 
+// Build URL with filter query params collected from data-filter-table inputs
+function buildFilterUrl(tableId) {
+    const table = document.getElementById(tableId);
+    const baseUrl = table ? table.dataset.listUrl : '#';
+    const params = new URLSearchParams();
+
+    document.querySelectorAll(`[data-filter-table="${tableId}"]`).forEach(input => {
+        const value = input.value.trim();
+        if (value) {
+            params.set(input.dataset.filterKey, value);
+        }
+    });
+
+    const qs = params.toString();
+    return baseUrl + (qs ? '?' + qs : '');
+}
+
+function applyFilters(tableId) {
+    const functionName = 'load' + tableId.charAt(0).toUpperCase() + tableId.slice(1);
+    if (typeof window[functionName] === 'function') {
+        window[functionName]();
+    }
+}
+
+function resetFilters(tableId) {
+    document.querySelectorAll(`[data-filter-table="${tableId}"]`).forEach(input => {
+        input.value = '';
+    });
+    applyFilters(tableId);
+}
+
 // Generic delete function
 window.deleteItem = function(url) {
     showConfirmModal(url);
