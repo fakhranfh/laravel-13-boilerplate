@@ -30,8 +30,8 @@ test('password change displays success alert', function () {
         try {
             $browser
                 ->type('current_password', 'Password123')
-                ->type('password', 'NewPassword@12345')
-                ->type('password_confirmation', 'NewPassword@12345')
+                ->type('password', 'Zx9#mK$vP2@nL8qR!')
+                ->type('password_confirmation', 'Zx9#mK$vP2@nL8qR!')
                 ->screenshot('03-form-filled')
                 ->press('Update Password')
                 ->pause(3000)

@@ -13,8 +13,8 @@
             <h1 class="font-headline-sm text-headline-sm text-on-surface truncate">{{ $title }}</h1>
         </div>
 
-        <div class="relative group">
-            <button class="flex items-center gap-space-md px-space-md py-space-xs rounded-full hover:bg-surface-container-low transition-colors duration-200 focus:outline-none">
+        <div class="relative group" id="user-menu-container">
+            <button id="user-menu-toggle" dusk="user-menu-toggle" onclick="(function(){var d=document.getElementById('user-dropdown');var open=d.getAttribute('data-open')==='true';d.setAttribute('data-open',open?'false':'true');if(open){d.classList.add('opacity-0','invisible');d.classList.remove('opacity-100','visible')}else{d.classList.remove('opacity-0','invisible');d.classList.add('opacity-100','visible')}})();return false;" class="flex items-center gap-space-md px-space-md py-space-xs rounded-full hover:bg-surface-container-low transition-colors duration-200 focus:outline-none">
                 @if(auth()->user()->profile_photo_path)
                     <img src="{{ auth()->user()->profile_photo_path }}" alt="Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant">
                 @else
@@ -30,7 +30,7 @@
             </button>
 
             <!-- Dropdown Menu -->
-            <div class="absolute right-0 mt-0 w-56 bg-surface rounded-xl border border-outline-variant shadow-[0_8px_24px_rgba(0,0,0,0.12)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 overflow-hidden">
+            <div id="user-dropdown" dusk="user-dropdown" data-open="false" class="absolute right-0 mt-0 w-56 bg-surface rounded-xl border border-outline-variant shadow-[0_8px_24px_rgba(0,0,0,0.12)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 overflow-hidden">
                 <div class="px-space-lg py-space-md border-b border-outline-variant sm:hidden">
                     <p class="font-label-md text-label-md text-on-surface">{{ auth()->user()->name }}</p>
                     <p class="font-body-sm text-body-sm text-secondary mt-space-xs">{{ auth()->user()->email }}</p>
