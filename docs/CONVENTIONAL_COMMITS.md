@@ -1,12 +1,12 @@
 # Conventional Commits
 
-> Spesifikasi untuk memberikan makna yang dapat dibaca oleh manusia dan mesin pada commit message.
+> A specification for adding human and machine readable meaning to commit messages.
 
-**Referensi:** [Ringkasan](https://www.conventionalcommits.org/en/v1.0.0/#summary) · [Spesifikasi Lengkap](https://www.conventionalcommits.org/en/v1.0.0/#specification) · [Kontribusi](https://github.com/conventional-commits/conventionalcommits.org)
+**References:** [Summary](https://www.conventionalcommits.org/en/v1.0.0/#summary) · [Full Specification](https://www.conventionalcommits.org/en/v1.0.0/#specification) · [Contributing](https://github.com/conventional-commits/conventionalcommits.org)
 
 ---
 
-## Format Commit
+## Commit Format
 
 ```
 <type>[optional scope]: <description>
@@ -16,48 +16,48 @@
 [optional footer(s)]
 ```
 
-### Elemen Struktural
+### Structural Elements
 
-| Elemen | Keterangan |
+| Element | Description |
 |---|---|
-| `fix:` | Memperbaiki bug — korelasi dengan `PATCH` di SemVer |
-| `feat:` | Menambah fitur baru — korelasi dengan `MINOR` di SemVer |
-| `BREAKING CHANGE:` | Perubahan yang merusak kompatibilitas — korelasi dengan `MAJOR` di SemVer |
-| Tipe lain | `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, dll. |
+| `fix:` | Patches a bug — correlates with `PATCH` in SemVer |
+| `feat:` | Introduces a new feature — correlates with `MINOR` in SemVer |
+| `BREAKING CHANGE:` | Introduces a breaking API change — correlates with `MAJOR` in SemVer |
+| Other types | `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, etc. |
 
-> **Scope** bersifat opsional dan ditulis dalam tanda kurung, contoh: `feat(parser): add ability to parse arrays`
+> **Scope** is optional and written in parentheses, e.g.: `feat(parser): add ability to parse arrays`
 
 ---
 
-## Contoh
+## Examples
 
 ```bash
-# Fitur baru biasa
+# Simple new feature
 feat: allow provided config object to extend other configs
 
-# Breaking change dengan footer
+# Breaking change with footer
 feat: allow provided config object to extend other configs
 
 BREAKING CHANGE: `extends` key in config file is now used for extending other config files
 
-# Breaking change dengan tanda seru
+# Breaking change with exclamation mark
 feat!: send an email to the customer when a product is shipped
 
-# Breaking change dengan scope
+# Breaking change with scope
 feat(api)!: send an email to the customer when a product is shipped
 
-# Breaking change dengan ! dan footer
+# Breaking change with ! and footer
 feat!: drop support for Node 6
 
 BREAKING CHANGE: use JavaScript features not available in Node 6.
 
-# Tanpa body
+# Without body
 docs: correct spelling of CHANGELOG
 
-# Dengan scope
+# With scope
 feat(lang): add Polish language
 
-# Multi-paragraph body dan beberapa footer
+# Multi-paragraph body and multiple footers
 fix: prevent racing of requests
 
 Introduce a request id and a reference to latest request. Dismiss
@@ -77,66 +77,66 @@ Refs: 676104e, a215868
 
 ---
 
-## Spesifikasi
+## Specification
 
-1. Commit **HARUS** diawali dengan tipe berupa kata benda (`feat`, `fix`, dll.), diikuti scope opsional, `!` opsional, lalu titik dua dan spasi.
-2. Tipe `feat` **HARUS** digunakan saat commit menambah fitur baru.
-3. Tipe `fix` **HARUS** digunakan saat commit memperbaiki bug.
-4. Scope **BOLEH** diberikan setelah tipe, berupa kata benda dalam tanda kurung, contoh: `fix(parser):`.
-5. Deskripsi **HARUS** langsung mengikuti titik dua setelah tipe/scope.
-6. Body yang lebih panjang **BOLEH** diberikan setelah deskripsi singkat, diawali satu baris kosong.
-7. Body berbentuk bebas dan **BOLEH** terdiri dari beberapa paragraf.
-8. Satu atau lebih footer **BOLEH** diberikan satu baris kosong setelah body, dengan format `token: value` atau `token #value`.
-9. Token footer **HARUS** menggunakan `-` sebagai pengganti spasi (misal: `Acked-by`), kecuali `BREAKING CHANGE`.
-10. Nilai footer **BOLEH** mengandung spasi dan baris baru; parsing berhenti saat token footer valid berikutnya ditemukan.
-11. Breaking change **HARUS** ditandai di prefix tipe/scope atau sebagai entri di footer.
-12. Jika di footer, breaking change **HARUS** berupa `BREAKING CHANGE: <deskripsi>`.
-13. Jika di prefix, breaking change **HARUS** ditandai dengan `!` sebelum `:`. Jika `!` digunakan, `BREAKING CHANGE:` di footer boleh dihilangkan.
-14. Tipe selain `feat` dan `fix` **BOLEH** digunakan, contoh: `docs: update ref docs`.
-15. Informasi dalam Conventional Commits **TIDAK BOLEH** diperlakukan case-sensitive, kecuali `BREAKING CHANGE` yang **HARUS** huruf kapital.
-16. `BREAKING-CHANGE` **HARUS** dianggap sinonim dengan `BREAKING CHANGE` saat digunakan sebagai token footer.
+1. Commits **MUST** be prefixed with a type, which consists of a noun (`feat`, `fix`, etc.), followed by an optional scope, an optional `!`, and a required colon and space.
+2. The type `feat` **MUST** be used when a commit adds a new feature.
+3. The type `fix` **MUST** be used when a commit represents a bug fix.
+4. A scope **MAY** be provided after a type, consisting of a noun in parentheses, e.g.: `fix(parser):`.
+5. A description **MUST** immediately follow the colon and space after the type/scope prefix.
+6. A longer commit body **MAY** be provided after the short description, beginning one blank line after.
+7. A commit body is free-form and **MAY** consist of any number of newline-separated paragraphs.
+8. One or more footers **MAY** be provided one blank line after the body, in the format `token: value` or `token #value`.
+9. A footer's token **MUST** use `-` in place of whitespace characters (e.g., `Acked-by`), except for `BREAKING CHANGE`.
+10. A footer's value **MAY** contain spaces and newlines; parsing terminates when the next valid footer token is found.
+11. Breaking changes **MUST** be indicated in the type/scope prefix or as an entry in the footer.
+12. If included in the footer, a breaking change **MUST** consist of `BREAKING CHANGE: <description>`.
+13. If included in the prefix, a breaking change **MUST** be indicated by a `!` immediately before the `:`. If `!` is used, `BREAKING CHANGE:` in the footer **MAY** be omitted.
+14. Types other than `feat` and `fix` **MAY** be used, e.g.: `docs: update ref docs`.
+15. The units of information that make up Conventional Commits **MUST NOT** be treated as case-sensitive, except for `BREAKING CHANGE` which **MUST** be uppercase.
+16. `BREAKING-CHANGE` **MUST** be treated as a synonym for `BREAKING CHANGE` when used as a token in a footer.
 
 ---
 
-## Manfaat
+## Benefits
 
-- Otomatis menghasilkan CHANGELOG.
-- Otomatis menentukan kenaikan versi semantik berdasarkan tipe commit.
-- Mengomunikasikan sifat perubahan kepada tim, publik, dan stakeholder.
-- Memicu proses build dan publish.
-- Memudahkan kontributor menjelajahi riwayat commit yang lebih terstruktur.
+- Automatically generate CHANGELOGs.
+- Automatically determine a semantic version bump based on commit types.
+- Communicate the nature of changes to teammates, the public, and other stakeholders.
+- Trigger build and publish processes.
+- Make it easier for contributors to explore a more structured commit history.
 
 ---
 
 ## FAQ
 
-**Bagaimana menangani commit di fase pengembangan awal?**
-Lanjutkan seolah produk sudah dirilis. Orang lain tetap perlu tahu apa yang diperbaiki atau berubah.
+**How should I handle commits during initial development?**
+Proceed as if the product has already been released. Others still need to know what was fixed or changed.
 
-**Apakah tipe commit huruf besar atau kecil?**
-Bebas, tapi harus konsisten.
+**Should commit types be uppercase or lowercase?**
+Either is fine, but it must be consistent.
 
-**Bagaimana jika commit sesuai lebih dari satu tipe?**
-Buat beberapa commit terpisah. Ini mendorong commit yang lebih terorganisir.
+**What if a commit fits more than one type?**
+Make multiple separate commits. This encourages more organized commits.
 
-**Apakah ini menghambat pengembangan cepat?**
-Tidak — ini menghambat pengembangan cepat yang tidak terorganisir, dan membantu bergerak lebih cepat dalam jangka panjang.
+**Does this slow down rapid development?**
+No — it slows down disorganized rapid development, and helps you move faster in the long run.
 
-**Bagaimana hubungannya dengan SemVer?**
+**How does this relate to SemVer?**
 - `fix` → `PATCH`
 - `feat` → `MINOR`
 - `BREAKING CHANGE` → `MAJOR`
 
-**Bagaimana jika salah tipe commit?**
-- Belum merge: gunakan `git rebase -i` untuk mengedit riwayat commit.
-- Sudah release: sesuaikan dengan tools dan proses yang digunakan.
-- Tipe di luar spec: tidak fatal, hanya akan diabaikan oleh tools berbasis spec.
+**What if I use the wrong commit type?**
+- Before merging: use `git rebase -i` to edit the commit history.
+- After releasing: adjust according to the tools and processes used.
+- Types outside the spec: not fatal, they will simply be ignored by spec-based tools.
 
-**Apakah semua kontributor harus mengikuti spec ini?**
-Tidak wajib. Workflow berbasis squash memungkinkan lead maintainer merapikan commit message saat merge.
+**Must all contributors follow this spec?**
+Not required. A squash-based merge workflow allows lead maintainers to clean up commit messages at merge time.
 
-**Bagaimana menangani revert commit?**
-Gunakan tipe `revert` dengan footer yang mereferensikan SHA commit yang di-revert:
+**How do I handle reverting a commit?**
+Use the `revert` type with a footer referencing the SHA of the reverted commit:
 
 ```
 revert: let us never again speak of the noodle incident
