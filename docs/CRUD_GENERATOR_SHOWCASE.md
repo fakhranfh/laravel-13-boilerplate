@@ -31,7 +31,7 @@ Running the command produces a complete, working module in seconds:
 | `resources/views/app/product/show.blade.php` | Detail view with action sidebar |
 | `routes/web.php` (modified) | RESTful resource routes + DataTables list route |
 | `app/Providers/AppServiceProvider.php` (modified) | Repository binding |
-| `resources/views/components/sidebar.blade.php` (modified) | Sidebar menu item |
+| `config/sidebar.php` (modified) | Sidebar menu entry |
 
 ---
 
@@ -47,8 +47,9 @@ The list page uses server-side DataTables with search, sort, and pagination. The
 
 **Key features:**
 - Header with title and "**+ NEW PRODUCTS**" button
-- Server-side DataTable via AJAX (`/products/data/list`)
-- ID, Name, Created, Actions columns
+- Column-aware filter UI (text, date range, enum dropdown) with Apply / Reset buttons
+- Server-side DataTable via AJAX (`/products/data/list`) — filters are passed as query params
+- Columns and filter inputs derived automatically from column definitions at generation time
 - Edit / View / Delete action buttons per row
 - Empty-state "No data available" when table has no records
 
@@ -140,20 +141,19 @@ DELETE  /products/{id}         → destroy
 
 ## Sidebar Integration
 
-The generator automatically adds a menu item to the sidebar with an auto-matched icon:
+The generator appends an entry to `config/sidebar.php`. The sidebar blade component renders all entries from this config, so no HTML is injected directly:
 
-```blade
-<!-- Products -->
-<li>
-    <a href="{{ route('products.index') }}" class="...
-        {{ request()->routeIs('products.*') ? 'bg-primary/20 text-primary' : 'hover:text-on-surface' }}">
-        <span class="material-symbols-outlined">shopping_cart</span>
-        <span>Products</span>
-    </a>
-</li>
+```php
+// config/sidebar.php
+[
+    'label'          => 'Products',
+    'route'          => 'products.index',
+    'icon'           => 'shopping_cart',
+    'active_pattern' => 'products.*',
+],
 ```
 
-Active state (`bg-primary/20`) is applied automatically when any `products.*` route is active.
+Active state is applied automatically when any `products.*` route is active.
 
 ---
 

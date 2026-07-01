@@ -1,7 +1,7 @@
 # CRUD Generator - Complete Guide
 
-**Version:** 2.0  
-**Date:** June 26, 2026  
+**Version:** 2.1  
+**Date:** July 1, 2026  
 **Status:** ✅ Production Ready
 
 ---
@@ -35,9 +35,10 @@ Tailwind CRUD Generator auto-creates professional CRUD views with:
 - ✅ Dark mode support
 - ✅ Responsive design (mobile-first)
 - ✅ RESTful routes
-- ✅ Auto-generated forms
-- ✅ Dusk browser tests
-- ✅ Automatic screenshots
+- ✅ Auto-generated forms with full enum support (select dropdowns)
+- ✅ Column-aware filter UI (text, date range, enum dropdown) out of the box
+- ✅ Server-side DataTables with filter-aware AJAX endpoint
+- ✅ Sidebar driven by `config/sidebar.php` (config-based, not hardcoded HTML)
 
 **Example:**
 ```bash
@@ -204,7 +205,7 @@ Column name (or "done" to finish, "back" to remove last column):
   - `url` = URL input
   - `tel` = Telephone input
   - `textarea` = Multi-line text
-  - `select` = Dropdown (for enums)
+  - `select` = Dropdown (for enums — options are pre-populated automatically)
   - `radio` = Radio buttons (for boolean)
   - `checkbox` = Checkbox input
   - `date` = Date picker
@@ -263,7 +264,8 @@ php artisan delete:rsc Product --migrations
 **Configuration:**
 - ✓ Routes: Removes `Route::resource('product', ...)` from `routes/web.php`
 - ✓ Service Provider: Removes binding from `app/Providers/AppServiceProvider.php`
-- ✓ Sidebar: Removes menu item from `resources/views/components/sidebar.blade.php`
+- ✓ Sidebar: Removes entry from `config/sidebar.php`
+- ✓ Runs `php artisan optimize` after cleanup
 
 ### Safety Features
 
@@ -381,8 +383,7 @@ resources/views/app/product/
 
 routes/web.php                                   # Auto-added routes
 app/Providers/AppServiceProvider.php             # Auto-added binding
-
-resources/views/components/sidebar.blade.php     # Auto-added menu item
+config/sidebar.php                               # Auto-added menu entry
 ```
 
 ### Output Messages
@@ -479,10 +480,10 @@ php artisan route:list | grep products
 - Header with model label
 - "New" button for creating
 - Success/error alert messages
-- Responsive data table
-- Hover effects on rows
+- Column-aware filter UI (text, date range, enum dropdown — per column type)
+- Apply / Reset filter buttons
+- Responsive server-side DataTable via AJAX (`/route/data/list`)
 - Pagination controls
-- JavaScript hook for DataTables
 
 **Layout:**
 ```
@@ -491,6 +492,8 @@ php artisan route:list | grep products
 │ Manage your Products                 │
 ├─────────────────────────────────────┤
 │ ✓ Success/Error messages            │
+├─────────────────────────────────────┤
+│ [Name ____] [Status ▼] [Apply][Reset]│
 ├─────────────────────────────────────┤
 │ ┌───────────────────────────────────┐
 │ │ ID │ Name │ Status │ Created │ Act
@@ -896,31 +899,25 @@ ProductRepository::update()
 
 ## Sidebar Management
 
-The generator automatically adds menu items to `resources/views/components/sidebar.blade.php`:
+The sidebar is driven by `config/sidebar.php`. The generator automatically appends an entry to that file:
 
-```blade
-<!-- product -->
-<li>
-    <a href="{{ route('products.index') }}" class="...">
-        Products
-    </a>
-</li>
+```php
+// config/sidebar.php
+[
+    'label' => 'Products',
+    'route' => 'products.index',
+    'icon'  => 'shopping_cart',
+    'active_pattern' => 'products.*',
+],
 ```
+
+The sidebar blade component loops over this config, so no HTML is injected into the view.
 
 ### Remove Sidebar Item
 
-When you delete a CRUD with `php artisan delete:rsc Product`, the sidebar item is automatically removed.
+When you delete a CRUD with `php artisan delete:rsc Product`, the config entry is automatically removed.
 
-**Manual removal:**
-```blade
-<!-- product -->
-<li>
-    <a href="{{ route('products.index') }}" class="...">
-        Products
-    </a>
-</li>
-<!-- Remove the entire comment and <li> block -->
-```
+**Manual removal:** Delete the matching array entry from `config/sidebar.php`.
 
 ---
 
@@ -1010,7 +1007,7 @@ php artisan make:rsc Product --label="Products"
    - Custom blade files
    - Modified routes
    - Custom repository methods
-3. Check sidebar for orphaned menu items
+3. Check `config/sidebar.php` for orphaned menu entries
 
 ```bash
 # Verify what was deleted
@@ -1108,17 +1105,17 @@ public function register(): void
 
 **Problem:** Menu item missing from sidebar  
 **Solution:**
-1. Check `resources/views/components/sidebar.blade.php`
-2. Generator tries to add it automatically
-3. If missing, add manually:
+1. Check `config/sidebar.php` — the generator appends an entry here
+2. If missing, add manually:
 
-```blade
-<!-- product -->
-<li>
-    <a href="{{ route('products.index') }}" class="px-4 py-2 hover:bg-gray-100">
-        Products
-    </a>
-</li>
+```php
+// config/sidebar.php
+[
+    'label' => 'Products',
+    'route' => 'products.index',
+    'icon'  => 'shopping_cart',
+    'active_pattern' => 'products.*',
+],
 ```
 
 ### Issue: Database table already exists
@@ -1374,20 +1371,22 @@ tests/Browser/
 **Generation Features:**
 - ✅ Interactive migration creation with column configuration
 - ✅ Automatic column verification
-- ✅ Smart input type selection
-- ✅ Repository + Service + Controller generation
+- ✅ Smart input type selection (full enum support with pre-populated select options)
+- ✅ Column-aware filter UI (text, date range, enum dropdown) on every index page
+- ✅ Repository + Service + Controller generation (filter-aware)
 - ✅ Form Request auto-generation
 - ✅ Blade view creation (index, create, edit, show)
 - ✅ Automatic route registration
 - ✅ Service Provider binding
-- ✅ Sidebar menu integration
+- ✅ Sidebar menu entry appended to `config/sidebar.php`
 
 **Cleanup Features:**
 - ✅ Complete file deletion
 - ✅ Route removal
 - ✅ Service Provider binding removal
-- ✅ Sidebar item removal
+- ✅ Sidebar entry removal from `config/sidebar.php`
 - ✅ Optional migration cleanup
+- ✅ Runs `php artisan optimize` after cleanup
 
 **Design:**
 - ✅ Modern Tailwind CSS v4 styling
@@ -1403,8 +1402,8 @@ tests/Browser/
 - ✅ Error handling with automatic cleanup
 
 **Status:** ✅ Production Ready  
-**Last Updated:** June 26, 2026  
-**Version:** 2.0  
+**Last Updated:** July 1, 2026  
+**Version:** 2.1  
 **Maintainer:** Laravel Boost Team
 
 ---
