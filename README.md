@@ -28,37 +28,33 @@ The public entry point with a hero section, application branding, and navigation
 
 ### Authentication
 
-| Register | Login |
-|---|---|
-| ![Register](docs/dusk/images/register-page.png) | ![Login](docs/dusk/images/login-page.png) |
+![Register](docs/dusk/images/register-page.png)
 
-| Register Error | Login Error |
-|---|---|
-| ![Register Error](docs/dusk/images/register-error.png) | ![Login Error](docs/dusk/images/login-error.png) |
+![Login](docs/dusk/images/login-page.png)
+
+![Register Error](docs/dusk/images/register-error.png)
+
+![Login Error](docs/dusk/images/login-error.png)
 
 ### Email Verification & Password Recovery
 
-| Email Verification Notice | Forgot Password |
-|---|---|
-| ![Email Verification](docs/dusk/images/email-verify-notice.png) | ![Forgot Password](docs/dusk/images/forgot-password-page.png) |
+![Email Verification](docs/dusk/images/email-verify-notice.png)
 
-| Reset Password | |
-|---|---|
-| ![Reset Password](docs/dusk/images/reset-password-page.png) | |
+![Forgot Password](docs/dusk/images/forgot-password-page.png)
+
+![Reset Password](docs/dusk/images/reset-password-page.png)
 
 ### Dashboard & Profile
 
-| Dashboard | Edit Profile |
-|---|---|
-| ![Dashboard](docs/dusk/images/dashboard.png) | ![Edit Profile](docs/dusk/images/edit-profile-page.png) |
+![Dashboard](docs/dusk/images/dashboard.png)
 
-Profile updated successfully:
+![Edit Profile](docs/dusk/images/edit-profile-page.png)
 
 ![Edit Profile Success](docs/dusk/images/edit-profile-success.png)
 
-| Change Password | Change Password Success |
-|---|---|
-| ![Change Password](docs/dusk/images/change-password-page.png) | ![Change Password Success](docs/dusk/images/change-password-success.png) |
+![Change Password](docs/dusk/images/change-password-page.png)
+
+![Change Password Success](docs/dusk/images/change-password-success.png)
 
 ---
 
@@ -110,13 +106,13 @@ php artisan make:rsc Product --label="Products"
 
 #### Generated Output
 
-| Index | Create |
-|---|---|
-| ![Product Index](docs/dusk/images/crud/product-index.png) | ![Product Create](docs/dusk/images/crud/product-create.png) |
+![Product Index](docs/dusk/images/crud/product-index.png)
 
-| Show | Edit |
-|---|---|
-| ![Product Show](docs/dusk/images/crud/product-show.png) | ![Product Edit](docs/dusk/images/crud/product-edit.png) |
+![Product Create](docs/dusk/images/crud/product-create.png)
+
+![Product Show](docs/dusk/images/crud/product-show.png)
+
+![Product Edit](docs/dusk/images/crud/product-edit.png)
 
 To delete a generated module:
 
