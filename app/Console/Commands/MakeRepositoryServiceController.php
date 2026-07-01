@@ -349,8 +349,22 @@ class MakeRepositoryServiceController extends Command
             $column['precision'] = (int) $precision;
             $column['scale'] = (int) $scale;
         } elseif ($columnType === 'enum') {
-            $values = $this->ask('Enum values (comma-separated)');
-            $column['values'] = array_map('trim', explode(',', $values));
+            $values = [];
+            $this->info('Enter enum values one by one. Leave blank to finish.');
+            while (true) {
+                $value = $this->ask('Enum value #'.(count($values) + 1).' (leave blank to finish)');
+                if ($value === null || trim($value) === '') {
+                    break;
+                }
+                $trimmed = trim($value);
+                if (in_array($trimmed, $values)) {
+                    $this->warn("Value \"{$trimmed}\" already added, skipping.");
+
+                    continue;
+                }
+                $values[] = $trimmed;
+            }
+            $column['values'] = $values;
         }
 
         // Common options
