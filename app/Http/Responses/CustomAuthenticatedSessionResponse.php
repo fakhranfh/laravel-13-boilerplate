@@ -8,7 +8,7 @@ class CustomAuthenticatedSessionResponse implements LoginResponse
 {
     public function toResponse($request)
     {
-        if ($request->user() && is_null($request->user()->email_verified_at)) {
+        if ($request->user() && ! $request->user()->hasVerifiedEmail()) {
             return redirect()->route('verification.notice');
         }
 
