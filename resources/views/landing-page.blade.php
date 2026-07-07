@@ -1,54 +1,32 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Laravel') }}</title>
+@extends('master')
 
-    <!-- Google Fonts: Inter for clean typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+@section('title', 'Welcome')
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-</head>
-<body class="antialiased bg-white text-gray-900 selection:bg-gray-900 selection:text-white">
+@section('body_class', 'bg-background text-on-background min-h-screen flex flex-col font-body-md')
+
+@section('content')
 
     <!-- Navbar -->
-    <header class="absolute inset-x-0 top-0 z-50">
-        <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
-            <div class="flex lg:flex-1">
-                <a href="/" class="-m-1.5 p-1.5 text-2xl font-bold tracking-tight text-gray-900">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-            </div>
+    <header class="sticky top-0 z-40 border-b border-outline-variant bg-background/90 backdrop-blur">
+        <nav class="mx-auto flex max-w-6xl items-center justify-between px-gutter py-space-md lg:px-space-xl" aria-label="Global">
+            <a href="/" class="flex items-center gap-space-sm font-headline-sm text-headline-sm text-on-surface">
+                <img src="{{ asset('logo.png') }}" alt="{{ config('app.name', 'Laravel') }}" class="h-7 w-auto" />
+                {{ config('app.name', 'Laravel') }}
+            </a>
 
-            <!-- Login / Register / Dashboard Links -->
             @if (Route::has('login'))
-                <div class="flex flex-1 justify-end items-center gap-x-6">
+                <div class="flex items-center gap-space-lg">
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600 transition">
+                        <a href="{{ url('/dashboard') }}" class="font-label-md text-label-md text-secondary hover:text-on-surface transition-colors">
                             Dashboard
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600 transition">
+                        <a href="{{ route('login') }}" class="font-label-md text-label-md text-secondary hover:text-on-surface transition-colors">
                             Log in
                         </a>
 
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="rounded-md bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 transition">
+                            <a href="{{ route('register') }}" class="flex min-h-[44px] items-center rounded bg-primary px-space-md font-label-md text-label-md text-on-primary hover:bg-primary-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
                                 Register
                             </a>
                         @endif
@@ -58,33 +36,91 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <main>
-        <div class="relative isolate px-6 pt-14 lg:px-8">
-            <div class="mx-auto max-w-3xl py-32 sm:py-48 lg:py-56 text-center">
-                <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-6xl">
-                    Solid Foundation for Your App
-                </h1>
-                <p class="mt-6 text-lg leading-8 text-gray-600">
-                    Stop wasting time on complicated setups. Build your project on a clean codebase and focus on what actually matters.
-                </p>
-                <div class="mt-10 flex items-center justify-center gap-x-6">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="rounded-md bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 transition">
-                            Go to Dashboard
-                        </a>
-                    @else
-                        <a href="{{ route('register') }}" class="rounded-md bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 transition">
-                            Get Started
-                        </a>
-                        <a href="{{ route('login') }}" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600 transition">
-                            Already have an account? <span aria-hidden="true">→</span>
-                        </a>
-                    @endauth
+    <main class="flex-1">
+        <!-- Hero -->
+        <section class="mx-auto max-w-6xl px-gutter pb-space-xl pt-space-xl lg:px-space-xl lg:pt-16">
+            <div class="grid items-center gap-space-xl lg:grid-cols-2">
+                <div class="reveal" style="animation-delay: 0.05s">
+                    <h1 class="text-balance font-headline-lg text-headline-lg text-on-surface sm:text-[2.75rem] sm:leading-[1.1] lg:text-[3.25rem] lg:leading-[1.05] tracking-[-0.03em]">
+                        A solid foundation, not another blank Laravel install.
+                    </h1>
+                    <p class="mt-space-md max-w-md text-pretty font-body-lg text-body-lg text-on-surface-variant">
+                        Auth, roles, a repository layer, and a CRUD generator already wired up. Skip the scaffolding and start on the part of the app that's actually yours.
+                    </p>
+                    <div class="mt-space-xl flex flex-wrap items-center gap-x-space-lg gap-y-space-sm">
+                        @auth
+                            <a href="{{ url('/dashboard') }}" class="flex min-h-[44px] items-center rounded bg-primary px-space-lg font-label-md text-label-md text-on-primary hover:bg-primary-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                                Go to Dashboard
+                            </a>
+                        @else
+                            <a href="{{ route('register') }}" class="flex min-h-[44px] items-center rounded bg-primary px-space-lg font-label-md text-label-md text-on-primary hover:bg-primary-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                                Get Started
+                            </a>
+                            <a href="{{ route('login') }}" class="group inline-flex items-center gap-space-xs font-label-md text-label-md text-on-surface hover:text-primary transition-colors">
+                                Already have an account?
+                                <span class="transition-transform group-hover:translate-x-0.5" aria-hidden="true">&rarr;</span>
+                            </a>
+                        @endauth
+                    </div>
+                </div>
+
+                <div class="reveal" style="animation-delay: 0.15s">
+                    <div class="overflow-hidden rounded-lg border border-outline-variant bg-surface">
+                        <div class="flex items-center gap-space-xs border-b border-outline-variant bg-surface-container-lowest px-space-md py-space-sm">
+                            <span class="h-2.5 w-2.5 rounded-full bg-outline-variant"></span>
+                            <span class="h-2.5 w-2.5 rounded-full bg-outline-variant"></span>
+                            <span class="h-2.5 w-2.5 rounded-full bg-outline-variant"></span>
+                            <span class="ml-space-xs font-label-sm text-label-sm text-on-surface-variant">terminal</span>
+                        </div>
+                        <div class="px-space-lg py-space-lg font-mono text-[13px] leading-7 text-on-surface-variant">
+                            <p><span class="text-outline">$</span> <span class="text-on-surface">php artisan make:rsc Product --label="Produk"</span></p>
+                            <p>&#10003; Model, migration &amp; factory created</p>
+                            <p>&#10003; Repository &amp; service layer wired</p>
+                            <p>&#10003; Controller &amp; form requests scaffolded</p>
+                            <p>&#10003; Index, create, edit &amp; show views generated</p>
+                            <p class="mt-space-sm"><span class="text-success">&#10003;</span> <span class="text-on-surface">Ready at /products</span></p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Feature strip -->
+        <section class="border-t border-outline-variant">
+            <div class="mx-auto grid max-w-6xl gap-x-space-xl gap-y-space-lg px-gutter py-space-xl sm:grid-cols-3 lg:px-space-xl">
+                <div>
+                    <h2 class="font-headline-sm text-headline-sm text-on-surface">Authentication, done</h2>
+                    <p class="mt-space-xs font-body-sm text-body-sm text-on-surface-variant">Login, registration, password reset and email verification via Fortify, ready before you write a line of code.</p>
+                </div>
+                <div>
+                    <h2 class="font-headline-sm text-headline-sm text-on-surface">Repository pattern</h2>
+                    <p class="mt-space-xs font-body-sm text-body-sm text-on-surface-variant">Controllers stay thin. Every entity gets a consistent repository and service layer out of the box.</p>
+                </div>
+                <div>
+                    <h2 class="font-headline-sm text-headline-sm text-on-surface">CRUD in one command</h2>
+                    <p class="mt-space-xs font-body-sm text-body-sm text-on-surface-variant">Generate a full resource, model to views, with a single Artisan command instead of a day of boilerplate.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
-</body>
-</html>
+    <footer class="border-t border-outline-variant">
+        <div class="mx-auto max-w-6xl px-gutter py-space-lg font-body-sm text-body-sm text-on-surface-variant lg:px-space-xl">
+            &copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}
+        </div>
+    </footer>
+
+    <style>
+        @media (prefers-reduced-motion: no-preference) {
+            .reveal {
+                opacity: 0;
+                transform: translateY(14px);
+                animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            @keyframes reveal {
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+    </style>
+
+@endsection
