@@ -164,6 +164,18 @@ MAIL_PASSWORD=your_password
 MAIL_ENCRYPTION=tls
 ```
 
+If no mail server is available at all (e.g. local dev without SMTP), disable email-dependent
+features instead of configuring `log`:
+
+```env
+FEATURE_EMAIL_ENABLED=false
+```
+
+This turns off Fortify's email verification and password reset, and applies profile email
+changes immediately instead of queuing a pending-verification step. The "Forgot Password?" link
+is hidden on the login page while disabled. Re-enable it any time by setting the flag back to
+`true`; no code changes are needed. See `config/features.php`.
+
 ---
 
 ## 4. Running the Application

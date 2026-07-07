@@ -172,7 +172,7 @@ Controller → Service → Repository Interface → Repository Implementation
 
 ### Prerequisites
 
-- PHP 8.4+
+- PHP 8.3+
 - Composer
 - Node.js 18+
 - MySQL (or SQLite for local dev)
