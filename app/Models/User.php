@@ -30,4 +30,13 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    public function hasVerifiedEmail(): bool
+    {
+        if (! config('features.email_enabled')) {
+            return true;
+        }
+
+        return parent::hasVerifiedEmail();
+    }
 }

@@ -35,7 +35,7 @@ class ProfileController extends Controller
 
         unset($data['profile_photo'], $data['remove_photo']);
 
-        if (isset($data['email']) && $data['email'] !== $user->email) {
+        if (isset($data['email']) && $data['email'] !== $user->email && config('features.email_enabled')) {
             $pendingEmail = $data['email'];
             unset($data['email']);
 

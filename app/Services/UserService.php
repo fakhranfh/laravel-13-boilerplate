@@ -45,6 +45,10 @@ class UserService
 
     public function sendPendingEmailVerification(User $user, string $verificationUrl): void
     {
+        if (! config('features.email_enabled')) {
+            return;
+        }
+
         Mail::to($user->pending_email)->send(new PendingEmailVerificationMail($user, $verificationUrl));
     }
 }

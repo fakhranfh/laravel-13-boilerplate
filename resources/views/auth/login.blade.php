@@ -47,7 +47,9 @@
             <div class="space-y-space-xs">
                 <div class="flex items-center justify-between">
                     <label class="block font-label-md text-label-md text-on-surface" for="password">Password</label>
-                    <a class="font-label-md text-label-md text-primary hover:underline transition-colors" href="{{ route('password.request') }}">Forgot Password?</a>
+                    @if (Route::has('password.request'))
+                        <a class="font-label-md text-label-md text-primary hover:underline transition-colors" href="{{ route('password.request') }}">Forgot Password?</a>
+                    @endif
                 </div>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="lock">lock</span>
