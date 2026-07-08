@@ -4,11 +4,15 @@ namespace App\Providers;
 
 use App\Http\Responses\CustomAuthenticatedSessionResponse;
 use App\Http\Responses\CustomVerifyEmailViewResponse;
+use App\Listeners\UpdateUserTimezoneOnLogin;
 use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\VerifyEmailViewResponse;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -32,6 +36,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(Login::class, UpdateUserTimezoneOnLogin::class);
     }
 }

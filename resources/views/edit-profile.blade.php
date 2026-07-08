@@ -128,6 +128,24 @@
                                 <p class="text-error text-body-sm font-body-sm mt-space-xs">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <!-- Timezone -->
+                        <div class="space-y-space-xs">
+                            <div class="flex items-center">
+                                <label class="font-label-md text-label-md text-on-surface" for="timezone">Timezone</label>
+                            </div>
+                            <div class="relative">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary/60 text-[20px]">schedule</span>
+                                <select class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-space-sm pl-10 pr-space-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none @error('timezone') border-error @enderror" id="timezone" name="timezone" required>
+                                    @foreach (timezone_identifiers_list() as $timezoneOption)
+                                        <option value="{{ $timezoneOption }}" @selected(old('timezone', auth()->user()->timezone) === $timezoneOption)>{{ $timezoneOption }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('timezone')
+                                <p class="text-error text-body-sm font-body-sm mt-space-xs">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <!-- Actions -->

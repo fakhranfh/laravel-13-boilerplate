@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 
 test('login page can be rendered', function () {
     $this->get('/login')->assertSuccessful();
@@ -42,6 +43,51 @@ test('login fails with unregistered email', function () {
     ])->assertSessionHasErrors('email');
 
     $this->assertGuest();
+});
+
+test('login updates timezone from ip address', function () {
+    Http::fake([
+        'ipapi.co/*' => Http::response('Asia/Jakarta', 200),
+    ]);
+
+    $user = User::factory()->create([
+        'email' => 'john@example.com',
+        'password' => 'password',
+        'timezone' => 'UTC',
+    ]);
+
+    $this->withServerVariables(['REMOTE_ADDR' => '8.8.8.8'])->post('/login', [
+        'email' => 'john@example.com',
+        'password' => 'password',
+    ])->assertRedirect('/dashboard');
+
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'timezone' => 'Asia/Jakarta',
+    ]);
+});
+
+test('login keeps existing timezone when ip lookup fails', function () {
+    Http::fake([
+        'ipapi.co/*' => Http::response('', 500),
+        'ip-api.com/*' => Http::response('', 500),
+    ]);
+
+    $user = User::factory()->create([
+        'email' => 'john@example.com',
+        'password' => 'password',
+        'timezone' => 'Asia/Jakarta',
+    ]);
+
+    $this->withServerVariables(['REMOTE_ADDR' => '8.8.8.8'])->post('/login', [
+        'email' => 'john@example.com',
+        'password' => 'password',
+    ])->assertRedirect('/dashboard');
+
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'timezone' => 'Asia/Jakarta',
+    ]);
 });
 
 test('login is throttled after 5 failed attempts', function () {

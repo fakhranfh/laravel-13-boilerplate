@@ -104,6 +104,36 @@ test('email must be unique', function () {
     $response->assertSessionHasErrors('email');
 });
 
+test('user can update timezone', function () {
+    $user = User::factory()->create(['timezone' => 'UTC']);
+
+    $response = $this->actingAs($user)->post('/edit-profile', [
+        'name' => $user->name,
+        'email' => $user->email,
+        'timezone' => 'Asia/Jakarta',
+    ]);
+
+    $response->assertRedirect('/edit-profile')
+        ->assertSessionHas('success');
+
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'timezone' => 'Asia/Jakarta',
+    ]);
+});
+
+test('invalid timezone is rejected', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('/edit-profile', [
+        'name' => $user->name,
+        'email' => $user->email,
+        'timezone' => 'Not/A_Timezone',
+    ]);
+
+    $response->assertSessionHasErrors('timezone');
+});
+
 test('name is required', function () {
     $user = User::factory()->create();
 
