@@ -33,6 +33,13 @@ class {$name}Repository implements {$name}RepositoryInterface
         return \$query->with(\$with)->get();
     }
 
+    public function paginate(array \$filters = [], int \$perPage = 10, string \$sort = 'id', string \$direction = 'desc', array \$with = [])
+    {
+        \$query = \$this->query(\$filters);
+
+        return \$query->with(\$with)->orderBy(\$sort, \$direction)->paginate(\$perPage)->withQueryString();
+    }
+
     public function getAll()
     {
         return {$name}::all();

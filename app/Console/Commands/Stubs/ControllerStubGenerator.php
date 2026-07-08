@@ -25,6 +25,7 @@ class ControllerStubGenerator
         $foreignDataMethod = $this->generateForeignDataMethod($name, $foreignKeys);
         $filterOnlyKeys = $this->buildFilterOnlyKeys($filterDefinitions);
         $jsonFields = $this->buildJsonFields($filterDefinitions);
+        $sortableKeys = $this->buildSortableKeys($filterDefinitions);
 
         return <<<PHP
 <?php
@@ -62,10 +63,16 @@ class {$name}Controller extends Controller
     public function list(Request \$request)
     {
         \$filters = \$request->only([{$filterOnlyKeys}]);
-        \$items = \$this->{$camelCaseName}Service->get(\$filters);
+        \$allowedSorts = [{$sortableKeys}];
+        \$sort = in_array(\$request->input('sort'), \$allowedSorts, true) ? \$request->input('sort') : 'id';
+        \$direction = \$request->input('direction') === 'asc' ? 'asc' : 'desc';
+        \$perPage = (int) \$request->input('per_page', 10);
+        \$perPage = in_array(\$perPage, [10, 25, 50, 100], true) ? \$perPage : 10;
+
+        \$items = \$this->{$camelCaseName}Service->paginate(\$filters, \$perPage, \$sort, \$direction);
 
         return response()->json([
-            'data' => \$items->map(fn(\$item) => [
+            'data' => collect(\$items->items())->map(fn(\$item) => [
                 'id' => \$item->id ?? '',
 {$jsonFields}
                 'actions' => [
@@ -73,7 +80,17 @@ class {$name}Controller extends Controller
                     'edit' => route('{$labelKebab}.edit', \$item->id),
                     'delete' => route('{$labelKebab}.destroy', \$item->id),
                 ]
-            ])->toArray()
+            ])->toArray(),
+            'meta' => [
+                'current_page' => \$items->currentPage(),
+                'last_page' => \$items->lastPage(),
+                'per_page' => \$items->perPage(),
+                'total' => \$items->total(),
+                'from' => \$items->firstItem(),
+                'to' => \$items->lastItem(),
+                'sort' => \$sort,
+                'direction' => \$direction,
+            ],
         ]);
     }
 
@@ -290,6 +307,22 @@ PHP;
         }
 
         return implode("\n", $lines);
+    }
+
+    private function buildSortableKeys(array $filterDefinitions): string
+    {
+        $keys = ["'id'"];
+
+        foreach ($filterDefinitions as $filter) {
+            if ($filter['type'] === 'datetime') {
+                $dbColumn = $filter['key'] === 'created' ? 'created_at' : $filter['key'];
+                $keys[] = "'{$dbColumn}'";
+            } else {
+                $keys[] = "'{$filter['key']}'";
+            }
+        }
+
+        return implode(', ', $keys);
     }
 
     private function buildFilterOnlyKeys(array $filterDefinitions): string

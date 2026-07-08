@@ -32,6 +32,11 @@ class {$name}Service
         return \$this->{$camelCaseName}Repository->get(\$filters, \$with);
     }
 
+    public function paginate(array \$filters = [], int \$perPage = 10, string \$sort = 'id', string \$direction = 'desc', array \$with = [])
+    {
+        return \$this->{$camelCaseName}Repository->paginate(\$filters, \$perPage, \$sort, \$direction, \$with);
+    }
+
     public function getAll()
     {
         return \$this->{$camelCaseName}Repository->getAll();

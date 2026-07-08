@@ -12,7 +12,7 @@ class TailwindBladeIndexStubGenerator
         $tableId = lcfirst(str_replace('-', '', ucwords($labelKebab, '-'))).'Table';
         $tableIdFunction = ucfirst($tableId);
         $filtersArray = $this->buildFiltersArray($filterDefinitions);
-        $tableHeaders = $this->buildTableHeaders($filterDefinitions);
+        $tableHeaders = $this->buildTableHeaders($filterDefinitions, $tableId);
         $tableRows = $this->buildTableRows($filterDefinitions);
 
         return <<<BLADE
@@ -65,7 +65,7 @@ class TailwindBladeIndexStubGenerator
 {$filtersArray}
             ]">
             <x-slot name="headers">
-                <th class="px-6 py-3 text-left font-semibold">{{ __('ID') }}</th>
+                <th class="px-6 py-3 text-left font-semibold cursor-pointer select-none" data-sort-table="{$tableId}" data-sort-key="id">{{ __('ID') }} <span class="sort-indicator"></span></th>
 {$tableHeaders}
                 <th class="px-6 py-3 text-right font-semibold">{{ __('Actions') }}</th>
             </x-slot>
@@ -119,15 +119,17 @@ function load{$tableIdFunction}() {
 BLADE;
     }
 
-    private function buildTableHeaders(array $filterDefinitions): string
+    private function buildTableHeaders(array $filterDefinitions, string $tableId): string
     {
         $lines = [];
 
         foreach ($filterDefinitions as $filter) {
+            $dbColumn = $filter['key'] === 'created' ? 'created_at' : $filter['key'];
+
             if ($filter['key'] === 'created' && $filter['type'] === 'datetime') {
-                $lines[] = "                <th class=\"px-6 py-3 text-left font-semibold\">{{ __('{$filter['label']}') }}</th>";
+                $lines[] = "                <th class=\"px-6 py-3 text-left font-semibold cursor-pointer select-none\" data-sort-table=\"{$tableId}\" data-sort-key=\"{$dbColumn}\">{{ __('{$filter['label']}') }} <span class=\"sort-indicator\"></span></th>";
             } elseif ($filter['type'] !== 'datetime') {
-                $lines[] = "                <th class=\"px-6 py-3 text-left font-semibold\">{{ __('{$filter['label']}') }}</th>";
+                $lines[] = "                <th class=\"px-6 py-3 text-left font-semibold cursor-pointer select-none\" data-sort-table=\"{$tableId}\" data-sort-key=\"{$dbColumn}\">{{ __('{$filter['label']}') }} <span class=\"sort-indicator\"></span></th>";
             }
         }
 

@@ -17,6 +17,8 @@ interface {$name}RepositoryInterface
 
     public function get(array \$filters = [], array \$with = []);
 
+    public function paginate(array \$filters = [], int \$perPage = 10, string \$sort = 'id', string \$direction = 'desc', array \$with = []);
+
     public function getAll();
 
     public function find(\$id);

@@ -88,4 +88,19 @@
             </tbody>
         </table>
     </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <label for="{{ $tableId }}-per-page">{{ __('Rows per page') }}</label>
+            <select id="{{ $tableId }}-per-page" data-perpage-table="{{ $tableId }}"
+                class="border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <span id="{{ $tableId }}-summary"></span>
+        </div>
+        <div id="{{ $tableId }}-pagination" class="flex items-center gap-1"></div>
+    </div>
 </div>
