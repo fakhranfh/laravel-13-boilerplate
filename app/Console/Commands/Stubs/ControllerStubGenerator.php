@@ -24,8 +24,12 @@ class ControllerStubGenerator
         $foreignServiceAssignments = $this->generateForeignServiceAssignments($name, $foreignKeys);
         $foreignDataMethod = $this->generateForeignDataMethod($name, $foreignKeys);
         $filterOnlyKeys = $this->buildFilterOnlyKeys($filterDefinitions);
+        $hasDatetimeField = $this->hasDatetimeField($filterDefinitions);
         $jsonFields = $this->buildJsonFields($filterDefinitions);
         $sortableKeys = $this->buildSortableKeys($filterDefinitions);
+        $viewerTimezoneLine = $hasDatetimeField
+            ? "        \$viewerTimezone = \$request->user()?->timezone ?: config('app.timezone');\n"
+            : '';
 
         return <<<PHP
 <?php
@@ -68,7 +72,7 @@ class {$name}Controller extends Controller
         \$direction = \$request->input('direction') === 'asc' ? 'asc' : 'desc';
         \$perPage = (int) \$request->input('per_page', 10);
         \$perPage = in_array(\$perPage, [10, 25, 50, 100], true) ? \$perPage : 10;
-
+{$viewerTimezoneLine}
         \$items = \$this->{$camelCaseName}Service->paginate(\$filters, \$perPage, \$sort, \$direction);
 
         return response()->json([
@@ -292,15 +296,26 @@ PHP;
         return $assignments;
     }
 
+    private function hasDatetimeField(array $filterDefinitions): bool
+    {
+        foreach ($filterDefinitions as $filter) {
+            if ($filter['type'] === 'datetime') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function buildJsonFields(array $filterDefinitions): string
     {
         $lines = [];
 
         foreach ($filterDefinitions as $filter) {
             if ($filter['key'] === 'created' && $filter['type'] === 'datetime') {
-                $lines[] = "                'created_at' => \$item->created_at?->format('Y-m-d H:i:s') ?? '',";
+                $lines[] = "                'created_at' => \$item->created_at?->clone()->setTimezone(\$viewerTimezone)->format('Y-m-d H:i:s') ?? '',";
             } elseif ($filter['type'] === 'datetime') {
-                $lines[] = "                '{$filter['key']}' => \$item->{$filter['key']}?->format('Y-m-d H:i:s') ?? '',";
+                $lines[] = "                '{$filter['key']}' => \$item->{$filter['key']}?->clone()->setTimezone(\$viewerTimezone)->format('Y-m-d H:i:s') ?? '',";
             } else {
                 $lines[] = "                '{$filter['key']}' => \$item->{$filter['key']} ?? '',";
             }
