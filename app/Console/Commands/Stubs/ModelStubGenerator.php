@@ -25,6 +25,7 @@ class ModelStubGenerator
 
 namespace App\Models;
 
+use App\Models\Concerns\HasViewerTimezoneDates;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +34,7 @@ use Illuminate\Database\Eloquent\Model;
 class {$singular} extends Model
 {
     /** @use HasFactory<\\Database\\Factories\\{$singular}Factory> */
-    use HasFactory;
+    use HasFactory, HasViewerTimezoneDates;
 
     protected \$table = '{$tableName}';
 }

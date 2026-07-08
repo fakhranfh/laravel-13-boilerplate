@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasViewerTimezoneDates;
 use Database\Factories\UserFactory;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -16,7 +17,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use CanResetPassword, HasFactory, Notifiable;
+    use CanResetPassword, HasFactory, HasViewerTimezoneDates, Notifiable;
 
     /**
      * Get the attributes that should be cast.

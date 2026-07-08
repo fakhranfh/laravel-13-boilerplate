@@ -261,14 +261,14 @@ HTML;
                         <div>
                             <p class="text-gray-500 dark:text-gray-400">{{ __('Created') }}</p>
                             <p class="text-gray-900 dark:text-white font-medium">
-                                {{ \$item->created_at?->format('d M Y H:i') }}
+                                {{ \$item->created_at_display?->format('d M Y H:i') }}
                             </p>
                         </div>
 
                         <div>
                             <p class="text-gray-500 dark:text-gray-400">{{ __('Updated') }}</p>
                             <p class="text-gray-900 dark:text-white font-medium">
-                                {{ \$item->updated_at?->format('d M Y H:i') }}
+                                {{ \$item->updated_at_display?->format('d M Y H:i') }}
                             </p>
                         </div>
                     </div>
