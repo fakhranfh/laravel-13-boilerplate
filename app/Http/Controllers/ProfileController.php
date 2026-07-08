@@ -67,6 +67,10 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = auth()->user();
 
+        if ((int) $request->query('user') !== $user->id) {
+            abort(403, 'This verification link does not belong to your account.');
+        }
+
         if (! $user->pending_email) {
             return redirect()->route('edit-profile')->with('success', 'No pending email change found.');
         }
