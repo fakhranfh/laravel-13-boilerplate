@@ -45,6 +45,11 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - If the user doesn't see a frontend change reflected in the UI, it could mean they need to run `npm run build`, `npm run dev`, or `composer run dev`. Ask them.
 
+## Permissions
+
+- When adding a new feature, always create a new permission migration and its group (if not already present) for that feature.
+- `php artisan make:rsc` automatically generates a CRUD permission migration (view/create/edit/delete) for the resource and assigns those permissions to the admin role.
+
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.

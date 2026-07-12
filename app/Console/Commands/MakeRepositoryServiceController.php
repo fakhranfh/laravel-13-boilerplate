@@ -7,6 +7,7 @@ use App\Console\Commands\Generators\ControllerGenerator;
 use App\Console\Commands\Generators\FormRequestGenerator;
 use App\Console\Commands\Generators\MigrationGenerator;
 use App\Console\Commands\Generators\ModelGenerator;
+use App\Console\Commands\Generators\PermissionMigrationGenerator;
 use App\Console\Commands\Generators\RepositoryGenerator;
 use App\Console\Commands\Generators\RouteGenerator;
 use App\Console\Commands\Generators\ServiceGenerator;
@@ -46,6 +47,8 @@ class MakeRepositoryServiceController extends Command
             }
 
             $this->generateModel($name, $this->columns);
+
+            $this->generatePermissionMigration($name, $label);
 
             $this->generateService($name, $label);
             $this->bindToServiceProvider($name);
@@ -105,6 +108,21 @@ class MakeRepositoryServiceController extends Command
         $generator->generate($name, $this->filterDefinitions, function (string $message, string $type) {
             $this->$type($message);
         });
+    }
+
+    private function generatePermissionMigration(string $name, string $label): void
+    {
+        $generator = new PermissionMigrationGenerator;
+        $generator->generate($name, $label, function (string $message, string $type) {
+            $this->$type($message);
+        });
+
+        if ($this->confirm('Run permission migration now?', true)) {
+            Artisan::call('migrate');
+            $this->info('Permission migration executed successfully.');
+        } else {
+            $this->info('Run <comment>php artisan migrate</comment> to execute the permission migration later.');
+        }
     }
 
     private function generateService(string $name, string $label): void
