@@ -22,18 +22,17 @@ class PermissionMigrationGenerator
     {
         $resource = Str::snake(Str::plural($name));
         $group = Str::title(str_replace('_', ' ', Str::snake(Str::plural($label))));
-        $className = 'Add'.Str::studly(Str::plural($name)).'PermissionsAndAssignToAdmin';
 
         $fileName = Carbon::now()->format('Y_m_d_His').'_add_'.$resource.'_permissions_and_assign_to_admin.php';
         $filePath = "{$this->migrationsPath}/{$fileName}";
 
-        $content = $this->generateContent($className, $resource, $group);
+        $content = $this->generateContent($resource, $group);
 
         $this->filesystem->put($filePath, $content);
         $callback("Permission migration created: {$filePath}", 'info');
     }
 
-    private function generateContent(string $className, string $resource, string $group): string
+    private function generateContent(string $resource, string $group): string
     {
         $labelBase = Str::title(str_replace('_', ' ', $resource));
 
