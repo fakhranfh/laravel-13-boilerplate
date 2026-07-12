@@ -5,13 +5,26 @@ namespace App\Http\Controllers;
 use App\Http\Requests\User\UpdateUserRolesRequest;
 use App\Services\RoleService;
 use App\Services\UserService;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
     public function __construct(
         protected UserService $userService,
         protected RoleService $roleService,
     ) {}
+
+    /**
+     * @return array<int, Middleware>
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:users.view', only: ['index']),
+            new Middleware('permission:users.assign-roles', only: ['editRoles', 'updateRoles']),
+        ];
+    }
 
     public function index()
     {

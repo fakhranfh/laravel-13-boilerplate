@@ -5,10 +5,25 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Permission\StorePermissionRequest;
 use App\Http\Requests\Permission\UpdatePermissionRequest;
 use App\Services\PermissionService;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PermissionController extends Controller
+class PermissionController extends Controller implements HasMiddleware
 {
     public function __construct(protected PermissionService $permissionService) {}
+
+    /**
+     * @return array<int, Middleware>
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:permissions.view', only: ['index', 'create', 'edit']),
+            new Middleware('permission:permissions.create', only: ['create', 'store']),
+            new Middleware('permission:permissions.update', only: ['edit', 'update']),
+            new Middleware('permission:permissions.delete', only: ['destroy']),
+        ];
+    }
 
     public function index()
     {

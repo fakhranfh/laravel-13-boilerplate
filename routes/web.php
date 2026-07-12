@@ -24,14 +24,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-    Route::middleware('role:admin')->group(function () {
-        Route::resource('roles', RoleController::class)->except('show');
-        Route::resource('permissions', PermissionController::class)->except('show');
+    Route::resource('roles', RoleController::class)->except('show');
+    Route::resource('permissions', PermissionController::class)->except('show');
 
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
-        Route::get('/users/{id}/roles', [UserController::class, 'editRoles'])->name('users.roles.edit');
-        Route::put('/users/{id}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
-    });
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{id}/roles', [UserController::class, 'editRoles'])->name('users.roles.edit');
+    Route::put('/users/{id}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
 });
 
 Route::post('/logout', function (Request $request) {
