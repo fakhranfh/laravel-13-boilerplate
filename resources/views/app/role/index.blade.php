@@ -37,7 +37,7 @@
                             <tr class="border-b border-outline-variant last:border-0">
                                 <td class="px-space-lg py-space-md font-body-md text-body-md text-on-surface">{{ $role->name }}</td>
                                 <td class="px-space-lg py-space-md font-body-sm text-body-sm text-secondary">
-                                    {{ $role->permissions->pluck('name')->join(', ') ?: '—' }}
+                                    {{ $role->permissions->map(fn ($permission) => $permission->label ?? $permission->name)->join(', ') ?: '—' }}
                                 </td>
                                 <td class="px-space-lg py-space-md text-right space-x-space-sm whitespace-nowrap">
                                     <a href="{{ route('roles.edit', $role) }}" class="font-label-md text-label-md text-primary hover:underline">Edit</a>

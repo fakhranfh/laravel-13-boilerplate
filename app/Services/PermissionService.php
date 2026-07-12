@@ -20,23 +20,16 @@ class PermissionService
         return $this->permissionRepository->getAll();
     }
 
+    /**
+     * @return Collection<string, Collection<int, Permission>>
+     */
+    public function getAllGrouped(): Collection
+    {
+        return $this->getAll()->groupBy(fn (Permission $permission) => $permission->group ?? 'Other');
+    }
+
     public function find(int $id): ?Permission
     {
         return $this->permissionRepository->find($id);
-    }
-
-    public function create(array $data): Permission
-    {
-        return $this->permissionRepository->create($data);
-    }
-
-    public function update(int $id, array $data): Permission
-    {
-        return $this->permissionRepository->update($id, $data);
-    }
-
-    public function delete(int $id): int
-    {
-        return $this->permissionRepository->delete($id);
     }
 }

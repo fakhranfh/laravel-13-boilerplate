@@ -10,21 +10,21 @@ use Spatie\Permission\PermissionRegistrar;
 return new class extends Migration
 {
     /**
-     * Permissions that gate every admin-facing feature currently in the app.
+     * Permissions that gate every admin-facing feature currently in the app,
+     * keyed by name with a human-readable label and a group they belong to.
+     * Permission management itself is view-only, so there is no
+     * permissions.create/update/delete.
      *
-     * @var array<int, string>
+     * @var array<string, array{label: string, group: string}>
      */
     private array $defaultPermissions = [
-        'roles.view',
-        'roles.create',
-        'roles.update',
-        'roles.delete',
-        'permissions.view',
-        'permissions.create',
-        'permissions.update',
-        'permissions.delete',
-        'users.view',
-        'users.assign-roles',
+        'roles.view' => ['label' => 'View Roles', 'group' => 'Roles'],
+        'roles.create' => ['label' => 'Create Roles', 'group' => 'Roles'],
+        'roles.update' => ['label' => 'Update Roles', 'group' => 'Roles'],
+        'roles.delete' => ['label' => 'Delete Roles', 'group' => 'Roles'],
+        'permissions.view' => ['label' => 'View Permissions', 'group' => 'Permissions'],
+        'users.view' => ['label' => 'View Users', 'group' => 'Users'],
+        'users.assign-roles' => ['label' => 'Assign User Roles', 'group' => 'Users'],
     ];
 
     /**
@@ -35,9 +35,12 @@ return new class extends Migration
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = collect($this->defaultPermissions)
-            ->map(fn (string $name) => Permission::firstOrCreate([
+            ->map(fn (array $attributes, string $name) => Permission::updateOrCreate([
                 'name' => $name,
                 'guard_name' => 'web',
+            ], [
+                'label' => $attributes['label'],
+                'group' => $attributes['group'],
             ]));
 
         $adminRole = Role::firstOrCreate([
@@ -70,7 +73,7 @@ return new class extends Migration
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        Permission::whereIn('name', $this->defaultPermissions)->delete();
+        Permission::whereIn('name', array_keys($this->defaultPermissions))->delete();
         Role::where('name', 'admin')->delete();
     }
 };

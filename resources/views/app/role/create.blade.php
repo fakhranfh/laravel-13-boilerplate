@@ -21,14 +21,31 @@
             </div>
 
             <div>
-                <label class="block font-label-md text-label-md text-on-surface mb-space-xs">Permissions</label>
-                <div class="grid grid-cols-2 gap-space-sm">
-                    @foreach ($permissions as $permission)
-                        <label class="flex items-center gap-space-sm font-body-md text-body-md text-on-surface">
-                            <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                {{ in_array($permission->id, old('permissions', [])) ? 'checked' : '' }}>
-                            {{ $permission->name }}
-                        </label>
+                <div class="flex items-center justify-between mb-space-sm">
+                    <label class="font-label-md text-label-md text-on-surface">Permissions</label>
+                    <label class="flex items-center gap-space-sm font-label-sm text-label-sm text-on-surface">
+                        <input type="checkbox" id="select-all-permissions">
+                        Select All
+                    </label>
+                </div>
+                <div class="space-y-space-lg divide-y divide-outline-variant">
+                    @foreach ($groupedPermissions as $group => $permissions)
+                        <div class="{{ $loop->first ? '' : 'pt-space-lg' }}">
+                            <label class="flex items-center gap-space-sm font-label-sm text-label-sm text-secondary uppercase mb-space-xs">
+                                <input type="checkbox" class="select-group-permissions" data-group="{{ $group }}">
+                                {{ $group }}
+                            </label>
+                            <div class="grid grid-cols-2 gap-space-sm">
+                                @foreach ($permissions as $permission)
+                                    <label class="flex items-center gap-space-sm font-body-md text-body-md text-on-surface">
+                                        <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
+                                            class="permission-checkbox" data-group="{{ $group }}"
+                                            {{ in_array($permission->id, old('permissions', [])) ? 'checked' : '' }}>
+                                        {{ $permission->label ?? $permission->name }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                     @endforeach
                 </div>
                 @error('permissions')
@@ -44,4 +61,6 @@
             </div>
         </form>
     </div>
+
+    <x-permission-checkbox-script />
 @endsection

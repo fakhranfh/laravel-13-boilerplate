@@ -32,7 +32,7 @@ class RoleController extends Controller implements HasMiddleware
     private function foreignData(): array
     {
         return [
-            'permissions' => $this->permissionService->getAll(),
+            'groupedPermissions' => $this->permissionService->getAllGrouped(),
         ];
     }
 

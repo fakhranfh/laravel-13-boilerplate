@@ -25,7 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
     Route::resource('roles', RoleController::class)->except('show');
-    Route::resource('permissions', PermissionController::class)->except('show');
+    Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/{id}/roles', [UserController::class, 'editRoles'])->name('users.roles.edit');

@@ -36,27 +36,4 @@ class PermissionRepository implements PermissionRepositoryInterface
     {
         return Permission::find($id);
     }
-
-    public function create(array $data): Permission
-    {
-        return Permission::create([
-            'name' => $data['name'],
-            'guard_name' => $data['guard_name'] ?? 'web',
-        ]);
-    }
-
-    public function update(int $id, array $data): Permission
-    {
-        $permission = Permission::findOrFail($id);
-        $permission->update([
-            'name' => $data['name'],
-        ]);
-
-        return $permission;
-    }
-
-    public function delete(int $id): int
-    {
-        return Permission::destroy($id);
-    }
 }
