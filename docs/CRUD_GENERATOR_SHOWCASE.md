@@ -29,6 +29,7 @@ Running the command produces a complete, working module in seconds:
 | `resources/views/app/product/create.blade.php` | Create form |
 | `resources/views/app/product/edit.blade.php` | Edit form with info sidebar |
 | `resources/views/app/product/show.blade.php` | Detail view with action sidebar |
+| `database/migrations/xxxx_add_products_permissions_and_assign_to_admin.php` | CRUD permission migration, synced to `admin` role |
 | `routes/web.php` (modified) | RESTful resource routes + DataTables list route |
 | `app/Providers/AppServiceProvider.php` (modified) | Repository binding |
 | `config/sidebar.php` (modified) | Sidebar menu entry |
@@ -154,6 +155,24 @@ The generator appends an entry to `config/sidebar.php`. The sidebar blade compon
 ```
 
 Active state is applied automatically when any `products.*` route is active.
+
+---
+
+## Permission Integration
+
+The generator also creates a permission migration that registers `products.view`, `products.create`, `products.update`, and `products.delete`, then syncs them to the `admin` role:
+
+```php
+// database/migrations/xxxx_add_products_permissions_and_assign_to_admin.php
+private array $permissions = [
+    'products.view'   => ['label' => 'View Products', 'group' => 'Products'],
+    'products.create' => ['label' => 'Create Products', 'group' => 'Products'],
+    'products.update' => ['label' => 'Update Products', 'group' => 'Products'],
+    'products.delete' => ['label' => 'Delete Products', 'group' => 'Products'],
+];
+```
+
+The migration is run immediately (prompted, defaults to yes) alongside the table migration, so the `admin` role can access the new module right away.
 
 ---
 

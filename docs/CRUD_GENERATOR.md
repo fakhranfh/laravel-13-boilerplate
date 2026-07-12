@@ -39,6 +39,7 @@ Tailwind CRUD Generator auto-creates professional CRUD views with:
 - ✅ Column-aware filter UI (text, date range, enum dropdown) out of the box
 - ✅ Server-side DataTables with filter-aware AJAX endpoint
 - ✅ Sidebar driven by `config/sidebar.php` (config-based, not hardcoded HTML)
+- ✅ Auto-generated CRUD permission migration (view/create/update/delete), assigned to the `admin` role
 
 **Example:**
 ```bash
@@ -61,11 +62,13 @@ php artisan make:rsc Product --label="Products"
 2. ✅ Interactively prompt for column details
 3. ✅ Create migration automatically
 4. ✅ Ask to run migration
-5. ✅ Generate Repository, Service, and Controller
-6. ✅ Generate Form Requests
-7. ✅ Configure form input types
-8. ✅ Generate Blade views
-9. ✅ Create routes in `routes/web.php`
+5. ✅ Generate a CRUD permission migration (view/create/update/delete) and assign it to the `admin` role
+6. ✅ Ask to run the permission migration
+7. ✅ Generate Repository, Service, and Controller
+8. ✅ Generate Form Requests
+9. ✅ Configure form input types
+10. ✅ Generate Blade views
+11. ✅ Create routes in `routes/web.php`
 
 ### Manual Setup (If Needed)
 
@@ -373,7 +376,8 @@ app/
     └── UpdateProductRequest.php                 # Update Validation
 
 database/migrations/
-└── xxxx_create_products_table.php               # Migration
+├── xxxx_create_products_table.php               # Migration
+└── xxxx_add_products_permissions_and_assign_to_admin.php  # Permission migration
 
 resources/views/app/product/
 ├── index.blade.php                              # List page
@@ -394,6 +398,8 @@ config/sidebar.php                               # Auto-added menu entry
 ✓ Column 'description' added
 ✓ Column 'price' added
 Migration executed successfully.
+Permission migration created: database/migrations/xxxx_add_products_permissions_and_assign_to_admin.php
+Permission migration executed successfully.
 ```
 
 **CRUD Generation Phase:**
@@ -1155,7 +1161,7 @@ Schema::table('products', function (Blueprint $table) {
 | Metric | Count |
 |--------|-------|
 | Console Commands | 2 (make:rsc, delete:rsc) |
-| Generator Classes | 7+ |
+| Generator Classes | 8+ |
 | Blade files per CRUD | 4 |
 | Supported column types | 13 |
 | Input type options | 10+ |
@@ -1334,6 +1340,7 @@ app/Console/Commands/Generators/
 ├── FormRequestGenerator.php
 ├── BladeGenerator.php
 ├── RouteGenerator.php
+├── PermissionMigrationGenerator.php
 └── ServiceProviderBindingGenerator.php
 ```
 
@@ -1371,6 +1378,7 @@ tests/Browser/
 **Generation Features:**
 - ✅ Interactive migration creation with column configuration
 - ✅ Automatic column verification
+- ✅ CRUD permission migration generation, synced to the `admin` role
 - ✅ Smart input type selection (full enum support with pre-populated select options)
 - ✅ Column-aware filter UI (text, date range, enum dropdown) on every index page
 - ✅ Repository + Service + Controller generation (filter-aware)
