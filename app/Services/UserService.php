@@ -5,8 +5,11 @@ namespace App\Services;
 use App\Mail\PendingEmailVerificationMail;
 use App\Models\User;
 use App\Repositories\User\UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 
 class UserService
 {
@@ -50,5 +53,40 @@ class UserService
         }
 
         Mail::to($user->pending_email)->send(new PendingEmailVerificationMail($user, $verificationUrl));
+    }
+
+    public function getAllWithRoles(): Collection
+    {
+        return $this->userRepository->getAll(['roles']);
+    }
+
+    public function find(int $id): ?User
+    {
+        return $this->userRepository->find($id);
+    }
+
+    public function syncRoles(User $user, array $roleIds): void
+    {
+        if ($user->hasRole('admin') && ! in_array($this->adminRoleId(), $roleIds)) {
+            $this->guardLastAdmin($user);
+        }
+
+        $this->userRepository->syncRoles($user, $roleIds);
+    }
+
+    private function guardLastAdmin(User $user): void
+    {
+        $otherAdmins = User::role('admin')->where('id', '!=', $user->id)->exists();
+
+        if (! $otherAdmins) {
+            throw ValidationException::withMessages([
+                'roles' => __('At least one user must keep the admin role.'),
+            ]);
+        }
+    }
+
+    private function adminRoleId(): ?int
+    {
+        return Role::where('name', 'admin')->value('id');
     }
 }

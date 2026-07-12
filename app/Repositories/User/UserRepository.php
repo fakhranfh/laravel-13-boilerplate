@@ -3,8 +3,10 @@
 namespace App\Repositories\User;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -42,6 +44,22 @@ class UserRepository implements UserRepositoryInterface
             'pending_email' => null,
             'email_verified_at' => now(),
         ]);
+    }
+
+    public function getAll(array $with = []): Collection
+    {
+        return User::with($with)->get();
+    }
+
+    public function find(int $id): ?User
+    {
+        return User::find($id);
+    }
+
+    public function syncRoles(User $user, array $roleIds): void
+    {
+        $roles = Role::whereIn('id', $roleIds)->get();
+        $user->syncRoles($roles);
     }
 
     private function removeProfilePhotoFile(User $user): void

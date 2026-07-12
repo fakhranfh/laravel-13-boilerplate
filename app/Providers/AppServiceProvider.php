@@ -5,6 +5,10 @@ namespace App\Providers;
 use App\Http\Responses\CustomAuthenticatedSessionResponse;
 use App\Http\Responses\CustomVerifyEmailViewResponse;
 use App\Listeners\UpdateUserTimezoneOnLogin;
+use App\Repositories\Permission\PermissionRepository;
+use App\Repositories\Permission\PermissionRepositoryInterface;
+use App\Repositories\Role\RoleRepository;
+use App\Repositories\Role\RoleRepositoryInterface;
 use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Auth\Events\Login;
@@ -29,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
+        $this->app->bind(PermissionRepositoryInterface::class, PermissionRepository::class);
     }
 
     /**

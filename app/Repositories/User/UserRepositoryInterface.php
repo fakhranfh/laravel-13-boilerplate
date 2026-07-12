@@ -3,6 +3,7 @@
 namespace App\Repositories\User;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 
 interface UserRepositoryInterface
@@ -16,4 +17,10 @@ interface UserRepositoryInterface
     public function setPendingEmail(User $user, string $pendingEmail): void;
 
     public function confirmPendingEmail(User $user): void;
+
+    public function getAll(array $with = []): Collection;
+
+    public function find(int $id): ?User;
+
+    public function syncRoles(User $user, array $roleIds): void;
 }
